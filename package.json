@@ -1,0 +1,33 @@
+{
+  "name": "js-data-adapter",
+  "description": "Base adapter interface for js-data adapters to extend.",
+  "version": "1.0.0-alpha.1",
+  "homepage": "https://github.com/js-data/js-data-adapter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/js-data/js-data-adapter.git"
+  },
+  "author": "js-data-adapter project authors",
+  "license": "MIT",
+  "main": "./src/index.js",
+  "keywords": [
+    "js-data",
+    "jsdata",
+    "adapter"
+  ],
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "scripts": {
+    "lint": "standard src/**/*.js",
+    "test": "npm run lint",
+    "release": "npm test && repo-tools authors",
+  },
+  "peerDependencies": {
+    "js-data": "^3.0.0-alpha.16",
+  },
+  "devDependencies": {
+    "babel-eslint": "5.0.0",
+    "standard": "6.0.7"
+  }
+}
