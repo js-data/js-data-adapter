@@ -770,6 +770,8 @@ addHiddenPropsToTarget(Adapter.prototype, {
    *
    * @name Adapter#log
    * @method
+   * @param {string} level Log level.
+   * @param {...*} values Values to log.
    */
   log (level, ...args) {
     if (level && !args.length) {

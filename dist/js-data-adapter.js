@@ -821,6 +821,8 @@
      *
      * @name Adapter#log
      * @method
+     * @param {string} level Log level.
+     * @param {...*} values Values to log.
      */
     log: function log(level) {
       for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
