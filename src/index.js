@@ -4,12 +4,9 @@ const {
   addHiddenPropsToTarget,
   extend,
   fillIn,
-  forEachRelation,
-  forOwn,
   get,
   isArray,
   isObject,
-  isString,
   isUndefined,
   plainCopy,
   resolve
@@ -38,24 +35,11 @@ const noop2 = function (...args) {
   return resolve()
 }
 
-const withoutRelations = function (mapper, props) {
-  const relationFields = mapper.relationFields || []
-
-  // Remove relations
-  const _props = {}
-  forOwn(props, function (value, key) {
-    if (relationFields.indexOf(key) === -1) {
-      _props[key] = value
-    }
-  })
-  return _props
-}
-
 const DEFAULTS = {
   /**
    * Whether to log debugging information.
    *
-   * @name RethinkDBAdapter#debug
+   * @name Adapter#debug
    * @type {boolean}
    * @default false
    */
@@ -64,7 +48,7 @@ const DEFAULTS = {
   /**
    * Whether to return a more detailed response object.
    *
-   * @name RethinkDBAdapter#raw
+   * @name Adapter#raw
    * @type {boolean}
    * @default false
    */
@@ -72,31 +56,32 @@ const DEFAULTS = {
 }
 
 /**
- * RethinkDBAdapter class.
+ * Response object used when `raw` is `true`. May contain other fields in
+ * addition to `data`.
  *
- * @example
- * // Use Container instead of DataStore on the server
- * import {Container} from 'js-data'
- * import RethinkdbDBAdapter from 'js-data-rethinkdb'
+ * @typedef {Object} Response
+ * @property {Object} data Response data.
+ * @property {string} op The operation for which the response was created.
+ */
+
+export function Response (data, meta, op) {
+  const self = this
+  self.data = data
+  fillIn(self, meta)
+  self.op = op
+}
+
+/**
+ * Abstract class meant to be extended by adapters.
  *
- * // Create a store to hold your Mappers
- * const store = new Container()
- *
- * // Create an instance of RethinkdbDBAdapter with default settings
- * const adapter = new RethinkdbDBAdapter()
- *
- * // Mappers in "store" will use the RethinkDB adapter by default
- * store.registerAdapter('rethinkdb', adapter, { default: true })
- *
- * // Create a Mapper that maps to a "user" table
- * store.defineMapper('user')
- *
- * @class RethinkDBAdapter
+ * @class Adapter
+ * @abstract
  * @param {Object} [opts] Configuration opts.
  * @param {boolean} [opts.debug=false] Whether to log debugging information.
- * @param {boolean} [opts.raw=false] Whether to return a more detailed response object.
+ * @param {boolean} [opts.raw=false] Whether to return a more detailed response
+ * object.
  */
-export default function RethinkDBAdapter (opts) {
+export default function Adapter (opts) {
   const self = this
   opts || (opts = {})
   fillIn(opts, DEFAULTS)
@@ -104,129 +89,406 @@ export default function RethinkDBAdapter (opts) {
 }
 
 /**
- * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
+ * Alternative to ES6 class syntax for extending `Adapter`.
  *
- * @name RethinkDBAdapter.extend
+ * @name Adapter.extend
  * @method
  * @param {Object} [instanceProps] Properties that will be added to the
  * prototype of the subclass.
  * @param {Object} [classProps] Properties that will be added as static
  * properties to the subclass itself.
- * @return {Object} Subclass of `RethinkDBAdapter`.
+ * @return {Object} Subclass of `Adapter`.
  */
-RethinkDBAdapter.extend = extend
+Adapter.extend = extend
 
-addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
+addHiddenPropsToTarget(Adapter.prototype, {
   /**
-   * @name RethinkDBAdapter#afterCreate
+   * Lifecycle method method called by <a href="#create__anchor">create</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#create__anchor">create</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the created record.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#create__anchor">create</a>.
+   *
+   * @name Adapter#afterCreate
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#create__anchor">create</a>.
+   * @param {Object} props The `props` argument passed to <a href="#create__anchor">create</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#create__anchor">create</a>.
+   * @property {string} opts.op `afterCreate`
+   * @param {Object|Response} response Created record or {@link Response}, depending on the value of `opts.raw`.
    */
   afterCreate: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterCreateMany
+   * Lifecycle method method called by <a href="#createMany__anchor">createMany</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#createMany__anchor">createMany</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the created records.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#createMany__anchor">createMany</a>.
+   *
+   * @name Adapter#afterCreate
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#createMany__anchor">createMany</a>.
+   * @param {Object[]} props The `props` argument passed to <a href="#createMany__anchor">createMany</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#createMany__anchor">createMany</a>.
+   * @property {string} opts.op `afterCreateMany`
+   * @param {Object[]|Response} response Created records or {@link Response}, depending on the value of `opts.raw`.
    */
   afterCreateMany: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterDestroy
+   * Lifecycle method method called by <a href="#destroy__anchor">destroy</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#destroy__anchor">destroy</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be `undefined`.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#destroy__anchor">destroy</a>.
+   *
+   * @name Adapter#afterDestroy
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#destroy__anchor">destroy</a>.
+   * @param {(string|number)} id The `id` argument passed to <a href="#destroy__anchor">destroy</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#destroy__anchor">destroy</a>.
+   * @property {string} opts.op `afterDestroy`
+   * @param {undefined|Response} response `undefined` or {@link Response}, depending on the value of `opts.raw`.
    */
   afterDestroy: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterDestroyAll
+   * Lifecycle method method called by <a href="#destroyAll__anchor">destroyAll</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#destroyAll__anchor">destroyAll</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be `undefined`.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#destroyAll__anchor">destroyAll</a>.
+   *
+   * @name Adapter#afterDestroyAll
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#destroyAll__anchor">destroyAll</a>.
+   * @param {Object} query The `query` argument passed to <a href="#destroyAll__anchor">destroyAll</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#destroyAll__anchor">destroyAll</a>.
+   * @property {string} opts.op `afterDestroyAll`
+   * @param {undefined|Response} response `undefined` or {@link Response}, depending on the value of `opts.raw`.
    */
   afterDestroyAll: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterFind
+   * Lifecycle method method called by <a href="#find__anchor">find</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#find__anchor">find</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the found record, if any.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#find__anchor">find</a>.
+   *
+   * @name Adapter#afterFind
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#find__anchor">find</a>.
+   * @param {(string|number)} id The `id` argument passed to <a href="#find__anchor">find</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#find__anchor">find</a>.
+   * @property {string} opts.op `afterFind`
+   * @param {Object|Response} response The found record or {@link Response}, depending on the value of `opts.raw`.
    */
   afterFind: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterFindAll
+   * Lifecycle method method called by <a href="#findAll__anchor">findAll</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#findAll__anchor">findAll</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the found records, if any.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#findAll__anchor">findAll</a>.
+   *
+   * @name Adapter#afterFindAll
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#findAll__anchor">findAll</a>.
+   * @param {Object} query The `query` argument passed to <a href="#findAll__anchor">findAll</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#findAll__anchor">findAll</a>.
+   * @property {string} opts.op `afterFindAll`
+   * @param {Object[]|Response} response The found records or {@link Response}, depending on the value of `opts.raw`.
    */
   afterFindAll: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterUpdate
+   * Lifecycle method method called by <a href="#update__anchor">update</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#update__anchor">update</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the updated record.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#update__anchor">update</a>.
+   *
+   * @name Adapter#afterUpdate
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#update__anchor">update</a>.
+   * @param {(string|number)} id The `id` argument passed to <a href="#update__anchor">update</a>.
+   * @param {Object} props The `props` argument passed to <a href="#update__anchor">update</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#update__anchor">update</a>.
+   * @property {string} opts.op `afterUpdate`
+   * @param {Object|Response} response The updated record or {@link Response}, depending on the value of `opts.raw`.
    */
   afterUpdate: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterUpdateAll
+   * Lifecycle method method called by <a href="#updateAll__anchor">updateAll</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#updateAll__anchor">updateAll</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the updated records, if any.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#updateAll__anchor">updateAll</a>.
+   *
+   * @name Adapter#afterUpdateAll
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @param {Object} props The `props` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @param {Object} query The `query` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @property {string} opts.op `afterUpdateAll`
+   * @param {Object[]|Response} response The updated records or {@link Response}, depending on the value of `opts.raw`.
    */
   afterUpdateAll: noop2,
 
   /**
-   * @name RethinkDBAdapter#afterUpdateMany
+   * Lifecycle method method called by <a href="#updateMany__anchor">updateMany</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#updateMany__anchor">updateMany</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the updated records, if any.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#updateMany__anchor">updateMany</a>.
+   *
+   * @name Adapter#afterUpdateMany
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#updateMany__anchor">updateMany</a>.
+   * @param {Object[]} records The `records` argument passed to <a href="#updateMany__anchor">updateMany</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#updateMany__anchor">updateMany</a>.
+   * @property {string} opts.op `afterUpdateMany`
+   * @param {Object[]|Response} response The updated records or {@link Response}, depending on the value of `opts.raw`.
    */
   afterUpdateMany: noop2,
 
   /**
-   * @name RethinkDBAdapter#beforeCreate
+   * Lifecycle method method called by <a href="#create__anchor">create</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#create__anchor">create</a> to wait for the Promise to resolve before continuing.
+   *
+   * `props` may be modified. You can also re-assign `props` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#create__anchor">create</a>.
+   *
+   * @name Adapter#beforeCreate
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#create__anchor">create</a>.
+   * @param {Object} props The `props` argument passed to <a href="#create__anchor">create</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#create__anchor">create</a>.
+   * @property {string} opts.op `beforeCreate`
    */
   beforeCreate: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeCreateMany
+   * Lifecycle method method called by <a href="#createMany__anchor">createMany</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#createMany__anchor">createMany</a> to wait for the Promise to resolve before continuing.
+   *
+   * `props` may be modified. You can also re-assign `props` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#createMany__anchor">createMany</a>.
+   *
+   * @name Adapter#beforeCreateMany
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#createMany__anchor">createMany</a>.
+   * @param {Object[]} props The `props` argument passed to <a href="#createMany__anchor">createMany</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#createMany__anchor">createMany</a>.
+   * @property {string} opts.op `beforeCreateMany`
    */
   beforeCreateMany: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeDestroy
+   * Lifecycle method method called by <a href="#destroy__anchor">destroy</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#destroy__anchor">destroy</a> to wait for the Promise to resolve before continuing.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#destroy__anchor">destroy</a>.
+   *
+   * @name Adapter#beforeDestroy
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#destroy__anchor">destroy</a>.
+   * @param {(string|number)} id The `id` argument passed to <a href="#destroy__anchor">destroy</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#destroy__anchor">destroy</a>.
+   * @property {string} opts.op `beforeDestroy`
    */
   beforeDestroy: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeDestroyAll
+   * Lifecycle method method called by <a href="#destroyAll__anchor">destroyAll</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#destroyAll__anchor">destroyAll</a> to wait for the Promise to resolve before continuing.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#destroyAll__anchor">destroyAll</a>.
+   *
+   * @name Adapter#beforeDestroyAll
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#destroyAll__anchor">destroyAll</a>.
+   * @param {Object} query The `query` argument passed to <a href="#destroyAll__anchor">destroyAll</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#destroyAll__anchor">destroyAll</a>.
+   * @property {string} opts.op `beforeDestroyAll`
    */
   beforeDestroyAll: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeFind
+   * Lifecycle method method called by <a href="#find__anchor">find</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#find__anchor">find</a> to wait for the Promise to resolve before continuing.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#find__anchor">find</a>.
+   *
+   * @name Adapter#beforeFind
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#find__anchor">find</a>.
+   * @param {(string|number)} id The `id` argument passed to <a href="#find__anchor">find</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#find__anchor">find</a>.
+   * @property {string} opts.op `beforeFind`
    */
   beforeFind: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeFindAll
+   * Lifecycle method method called by <a href="#findAll__anchor">findAll</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#findAll__anchor">findAll</a> to wait for the Promise to resolve before continuing.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#findAll__anchor">findAll</a>.
+   *
+   * @name Adapter#beforeFindAll
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#findAll__anchor">findAll</a>.
+   * @param {Object} query The `query` argument passed to <a href="#findAll__anchor">findAll</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#findAll__anchor">findAll</a>.
+   * @property {string} opts.op `beforeFindAll`
    */
   beforeFindAll: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeUpdate
+   * Lifecycle method method called by <a href="#update__anchor">update</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#update__anchor">update</a> to wait for the Promise to resolve before continuing.
+   *
+   * `props` may be modified. You can also re-assign `props` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#update__anchor">update</a>.
+   *
+   * @name Adapter#beforeUpdate
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#update__anchor">update</a>.
+   * @param {(string|number)} id The `id` argument passed to <a href="#update__anchor">update</a>.
+   * @param {Object} props The `props` argument passed to <a href="#update__anchor">update</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#update__anchor">update</a>.
+   * @property {string} opts.op `beforeUpdate`
    */
   beforeUpdate: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeUpdateAll
+   * Lifecycle method method called by <a href="#updateAll__anchor">updateAll</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#updateAll__anchor">updateAll</a> to wait for the Promise to resolve before continuing.
+   *
+   * `props` may be modified. You can also re-assign `props` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#updateAll__anchor">updateAll</a>.
+   *
+   * @name Adapter#beforeUpdateAll
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @param {Object} props The `props` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @param {Object} query The `query` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#updateAll__anchor">updateAll</a>.
+   * @property {string} opts.op `beforeUpdateAll`
    */
   beforeUpdateAll: noop,
 
   /**
-   * @name RethinkDBAdapter#beforeUpdateMany
+   * Lifecycle method method called by <a href="#updateMany__anchor">updateMany</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#updateMany__anchor">updateMany</a> to wait for the Promise to resolve before continuing.
+   *
+   * `props` may be modified. You can also re-assign `props` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#updateMany__anchor">updateMany</a>.
+   *
+   * @name Adapter#beforeUpdateMany
    * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#updateMany__anchor">updateMany</a>.
+   * @param {Object[]} props The `props` argument passed to <a href="#updateMany__anchor">updateMany</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#updateMany__anchor">updateMany</a>.
+   * @property {string} opts.op `beforeUpdateMany`
    */
   beforeUpdateMany: noop,
 
   /**
-   * @name RethinkDBAdapter#dbg
+   * Shortcut for `#log('debug'[, arg1[, arg2[, argn]]])`.
+   *
+   * @name Adapter#dbg
    * @method
    */
   dbg (...args) {
@@ -234,17 +496,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Create a new record.
+   * Create a new record.  Called by `Mapper#create`.
    *
-   * @name RethinkDBAdapter#create
+   * @name Adapter#create
    * @method
    * @param {Object} mapper The mapper.
    * @param {Object} props The record to be created.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   create (mapper, props, opts) {
@@ -252,17 +512,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Create multiple records in a single batch.
+   * Create multiple records in a single batch. Called by `Mapper#createMany`.
    *
-   * @name RethinkDBAdapter#createMany
+   * @name Adapter#createMany
    * @method
    * @param {Object} mapper The mapper.
    * @param {Object} props The records to be created.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   createMany (mapper, props, opts) {
@@ -270,17 +528,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Destroy the record with the given primary key.
+   * Destroy the record with the given primary key. Called by
+   * `Mapper#destroy`.
    *
-   * @name RethinkDBAdapter#destroy
+   * @name Adapter#destroy
    * @method
    * @param {Object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to destroy.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   destroy (mapper, id, opts) {
@@ -288,9 +545,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Destroy the records that match the selection query.
+   * Destroy the records that match the selection query. Called by
+   * `Mapper#destroyAll`.
    *
-   * @name RethinkDBAdapter#destroyAll
+   * @name Adapter#destroyAll
    * @method
    * @param {Object} mapper the mapper.
    * @param {Object} [query] Selection query.
@@ -301,12 +559,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
-   * @param {Object} [opts.operators] Override the default predicate functions
-   * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   destroyAll (mapper, query, opts) {
@@ -319,7 +573,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * There may be reasons why you may want to override this method, like when
    * the id of the parent doesn't exactly match up to the key on the child.
    *
-   * @name RethinkDBAdapter#makeHasManyForeignKey
+   * Override with care.
+   *
+   * @name Adapter#makeHasManyForeignKey
    * @method
    * @return {*}
    */
@@ -330,7 +586,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   /**
    * Load a hasMany relationship.
    *
-   * @name RethinkDBAdapter#loadHasMany
+   * Override with care.
+   *
+   * @name Adapter#loadHasMany
    * @method
    * @return {Promise}
    */
@@ -376,7 +634,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   /**
    * Load a hasOne relationship.
    *
-   * @name RethinkDBAdapter#loadHasOne
+   * Override with care.
+   *
+   * @name Adapter#loadHasOne
    * @method
    * @return {Promise}
    */
@@ -397,7 +657,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   /**
    * Return the foreignKey from the given record for the provided relationship.
    *
-   * @name RethinkDBAdapter#makeBelongsToForeignKey
+   * Override with care.
+   *
+   * @name Adapter#makeBelongsToForeignKey
    * @method
    * @return {*}
    */
@@ -408,7 +670,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   /**
    * Load a belongsTo relationship.
    *
-   * @name RethinkDBAdapter#loadBelongsTo
+   * Override with care.
+   *
+   * @name Adapter#loadBelongsTo
    * @method
    * @return {Promise}
    */
@@ -446,16 +710,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Retrieve the record with the given primary key.
+   * Retrieve the record with the given primary key. Called by `Mapper#find`.
    *
-   * @name RethinkDBAdapter#find
+   * @name Adapter#find
    * @method
    * @param {Object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to retrieve.
    * @param {Object} [opts] Configuration options.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @param {string[]} [opts.with=[]] Relations to eager load.
    * @return {Promise}
    */
@@ -466,7 +729,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   /**
    * Retrieve the records that match the selection query.
    *
-   * @name RethinkDBAdapter#findAll
+   * @name Adapter#findAll
    * @method
    * @param {Object} mapper The mapper.
    * @param {Object} [query] Selection query.
@@ -477,11 +740,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
-   * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @param {string[]} [opts.with=[]] Relations to eager load.
    * @return {Promise}
    */
@@ -490,32 +750,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Resolve the predicate function for the specified operator based on the
-   * given options and this adapter's settings.
-   *
-   * @name RethinkDBAdapter#getOperator
-   * @method
-   * @param {string} operator The name of the operator.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
-   * for specified operators.
-   * @return {*} The predicate function for the specified operator.
-   */
-  getOperator (operator, opts) {
-    if (!this.constructor.OPS) {
-      throw new Error('Not supported!')
-    }
-    opts || (opts = {})
-    opts.operators || (opts.operators = {})
-    let ownOps = this.operators || {}
-    return isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator]
-  },
-
-  /**
    * Resolve the value of the specified option based on the given options and
-   * this adapter's settings.
+   * this adapter's settings. Override with care.
    *
-   * @name RethinkDBAdapter#getOpt
+   * @name Adapter#getOpt
    * @method
    * @param {string} opt The name of the option.
    * @param {Object} [opts] Configuration options.
@@ -527,9 +765,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Logging utility method.
+   * Logging utility method. Override this method if you want to send log
+   * messages to something other than the console.
    *
-   * @name RethinkDBAdapter#log
+   * @name Adapter#log
    * @method
    */
   log (level, ...args) {
@@ -540,7 +779,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     if (level === 'debug' && !this.debug) {
       return
     }
-    const prefix = `${level.toUpperCase()}: (RethinkDBAdapter)`
+    const prefix = `${level.toUpperCase()}: (Adapter)`
     if (console[level]) {
       console[level](prefix, ...args)
     } else {
@@ -549,18 +788,29 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Apply the given update to the record with the specified primary key.
+   * @name Adapter#respond
+   * @method
+   * @param {Object} response Response object.
+   * @param {Object} opts Configuration options.
+   * return {Object} If `opts.raw == true` then return `response`, else return
+   * `response.data`.
+   */
+  respond (response, opts) {
+    return this.getOpt('raw', opts) ? response : response.data
+  },
+
+  /**
+   * Apply the given update to the record with the specified primary key. Called
+   * by `Mapper#update`.
    *
-   * @name RethinkDBAdapter#update
+   * @name Adapter#update
    * @method
    * @param {Object} mapper The mapper.
    * @param {(string|number)} id The primary key of the record to be updated.
    * @param {Object} props The update to apply to the record.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.updateOpts] Options to pass to r#update.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   update (mapper, id, props, opts) {
@@ -569,8 +819,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
   /**
    * Apply the given update to all records that match the selection query.
+   * Called by `Mapper#updateAll`.
    *
-   * @name RethinkDBAdapter#updateAll
+   * @name Adapter#updateAll
    * @method
    * @param {Object} mapper The mapper.
    * @param {Object} props The update to apply to the selected records.
@@ -582,12 +833,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
-   * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
-   * @param {Object} [opts.updateOpts] Options to pass to r#update.
    * @return {Promise}
    */
   updateAll (mapper, props, query, opts) {
@@ -595,17 +842,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * Update the given records in a single batch.
+   * Update the given records in a single batch. Called by `Mapper#updateMany`.
    *
-   * @name RethinkDBAdapter#updateMany
+   * @name Adapter#updateMany
    * @method
    * @param {Object} mapper The mapper.
    * @param {Object[]} records The records to update.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   updateMany (mapper, records, opts) {

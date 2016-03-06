@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
-  "description": "Base adapter interface for js-data adapters to extend.",
-  "version": "1.0.0-alpha.1",
+  "description": "Base adapter class that all other js-data adapters extend.",
+  "version": "0.1.0",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   },
   "author": "js-data-adapter project authors",
   "license": "MIT",
-  "main": "./src/index.js",
+  "main": "./dist/js-data-adapter.js",
   "keywords": [
     "js-data",
     "jsdata",
@@ -19,15 +19,23 @@
     "parser": "babel-eslint"
   },
   "scripts": {
-    "lint": "standard src/**/*.js",
-    "test": "npm run lint",
-    "release": "npm test && repo-tools authors",
+    "lint": "repo-tools lint src/index.js",
+    "bundle": "rollup -c rollup.config.js -f umd -o dist/js-data-adapter.js -m dist/js-data-adapter.js.map src/index.js",
+    "watch": "watch \"npm run bundle\" src/",
+    "test": "npm run lint && npm run bundle",
+    "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
+    "release": "npm test && npm run repo-tools"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-alpha.16",
+    "js-data": "^3.0.0-alpha.16"
   },
   "devDependencies": {
-    "babel-eslint": "5.0.0",
-    "standard": "6.0.7"
+    "babel-core": "6.6.5",
+    "babel-preset-es2015-rollup": "1.1.1",
+    "estraverse-fb": "1.3.1",
+    "js-data-repo-tools": "0.1.0",
+    "rollup": "0.25.4",
+    "rollup-plugin-babel": "2.4.0",
+    "watch": "0.17.1"
   }
 }
