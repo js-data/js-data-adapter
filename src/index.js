@@ -584,6 +584,19 @@ addHiddenPropsToTarget(Adapter.prototype, {
   },
 
   /**
+   * Return the foreignKeys from the given record for the provided relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#makeHasManyForeignKeys
+   * @method
+   * @return {*}
+   */
+  makeHasManyForeignKeys (mapper, def, record) {
+    return get(record, mapper.idAttribute)
+  },
+
+  /**
    * Load a hasMany relationship.
    *
    * Override with care.

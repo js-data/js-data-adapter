@@ -1,3 +1,7 @@
+##### 0.1.2 - 06 March 2016
+
+Added makeHasManyForeignKeys
+
 ##### 0.1.1 - 06 March 2016
 
 Fixed a comment. Upgraded js-data-repo-tools.

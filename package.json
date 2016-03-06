@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
   "description": "Base adapter class that all other js-data adapters extend.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "parser": "babel-eslint"
   },
   "scripts": {
-    "lint": "repo-tools lint src/index.js",
+    "lint": "repo-tools lint src/index.js rollup.config.js",
     "bundle": "rollup -c rollup.config.js -f umd -o dist/js-data-adapter.js -m dist/js-data-adapter.js.map src/index.js",
     "watch": "watch \"npm run bundle\" src/",
     "test": "npm run lint && npm run bundle",
