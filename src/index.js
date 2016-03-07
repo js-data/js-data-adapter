@@ -66,6 +66,7 @@ const DEFAULTS = {
 
 export function Response (data, meta, op) {
   const self = this
+  meta || (meta = {})
   self.data = data
   fillIn(self, meta)
   self.op = op

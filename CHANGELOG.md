@@ -1,3 +1,7 @@
+##### 0.1.3 - 08 March 2016
+
+Fix for Response class
+
 ##### 0.1.2 - 06 March 2016
 
 Added makeHasManyForeignKeys

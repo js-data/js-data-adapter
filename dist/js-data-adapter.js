@@ -96,6 +96,7 @@
 
   function Response(data, meta, op) {
     var self = this;
+    meta || (meta = {});
     self.data = data;
     fillIn(self, meta);
     self.op = op;
