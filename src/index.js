@@ -617,8 +617,10 @@ addHiddenPropsToTarget(Adapter.prototype, {
     const IDs = records.map(function (record) {
       return self.makeHasManyForeignKey(mapper, def, record)
     })
-    const query = {}
-    const criteria = query[def.foreignKey] = {}
+    const query = {
+      where: {}
+    }
+    const criteria = query.where[def.foreignKey] = {}
     if (singular) {
       // more efficient query when we only have one record
       criteria['=='] = IDs[0]

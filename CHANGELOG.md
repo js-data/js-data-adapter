@@ -1,3 +1,7 @@
+##### 0.1.4 - 09 March 2016
+
+Fix for loadHasMany
+
 ##### 0.1.3 - 08 March 2016
 
 Fix for Response class

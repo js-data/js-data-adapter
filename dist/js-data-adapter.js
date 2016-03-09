@@ -658,8 +658,10 @@
       var IDs = records.map(function (record) {
         return self.makeHasManyForeignKey(mapper, def, record);
       });
-      var query = {};
-      var criteria = query[def.foreignKey] = {};
+      var query = {
+        where: {}
+      };
+      var criteria = query.where[def.foreignKey] = {};
       if (singular) {
         // more efficient query when we only have one record
         criteria['=='] = IDs[0];
