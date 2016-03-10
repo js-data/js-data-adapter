@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('js-data')) :
-  typeof define === 'function' && define.amd ? define('js-data-adapter', ['exports', 'js-data'], factory) :
-  (factory((global.Adapter = global.Adapter || {}),global.js-data));
-}(this, function (exports,jsData) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('js-data')) :
+  typeof define === 'function' && define.amd ? define('js-data-adapter', ['js-data'], factory) :
+  (factory(global.JSData));
+}(this, function (jsData) { 'use strict';
 
   var babelHelpers = {};
   babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -26,20 +26,58 @@
     return obj;
   };
 
+  babelHelpers.slicedToArray = function () {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+
+      try {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+
+          if (i && _arr.length === i) break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"]) _i["return"]();
+        } finally {
+          if (_d) throw _e;
+        }
+      }
+
+      return _arr;
+    }
+
+    return function (arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+
   babelHelpers;
 
   var addHiddenPropsToTarget = jsData.utils.addHiddenPropsToTarget;
   var extend = jsData.utils.extend;
   var fillIn = jsData.utils.fillIn;
+  var forEachRelation = jsData.utils.forEachRelation;
   var get = jsData.utils.get;
   var isArray = jsData.utils.isArray;
   var isObject = jsData.utils.isObject;
   var isUndefined = jsData.utils.isUndefined;
+  var omit = jsData.utils.omit;
   var plainCopy = jsData.utils.plainCopy;
   var resolve = jsData.utils.resolve;
 
-
-  var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
 
   var noop = function noop() {
     var self = this;
@@ -65,6 +103,23 @@
     return resolve();
   };
 
+  var unique = function unique(array) {
+    var seen = {};
+    var final = [];
+    array.forEach(function (item) {
+      if (item in seen) {
+        return;
+      }
+      final.push(item);
+      seen[item] = 0;
+    });
+    return final;
+  };
+
+  var withoutRelations = function withoutRelations(mapper, props) {
+    return omit(props, mapper.relationFields || []);
+  };
+
   var DEFAULTS = {
     /**
      * Whether to log debugging information.
@@ -86,23 +141,6 @@
   };
 
   /**
-   * Response object used when `raw` is `true`. May contain other fields in
-   * addition to `data`.
-   *
-   * @typedef {Object} Response
-   * @property {Object} data Response data.
-   * @property {string} op The operation for which the response was created.
-   */
-
-  function Response(data, meta, op) {
-    var self = this;
-    meta || (meta = {});
-    self.data = data;
-    fillIn(self, meta);
-    self.op = op;
-  }
-
-  /**
    * Abstract class meant to be extended by adapters.
    *
    * @class Adapter
@@ -118,6 +156,26 @@
     fillIn(opts, DEFAULTS);
     fillIn(self, opts);
   }
+
+  Adapter.reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
+
+  /**
+   * Response object used when `raw` is `true`. May contain other fields in
+   * addition to `data`.
+   *
+   * @typedef {Object} Response
+   * @property {Object} data Response data.
+   * @property {string} op The operation for which the response was created.
+   */
+  function Response(data, meta, op) {
+    var self = this;
+    meta || (meta = {});
+    self.data = data;
+    fillIn(self, meta);
+    self.op = op;
+  }
+
+  Adapter.Response = Response;
 
   /**
    * Alternative to ES6 class syntax for extending `Adapter`.
@@ -532,7 +590,7 @@
 
 
     /**
-     * Create a new record.  Called by `Mapper#create`.
+     * Create a new record. Called by `Mapper#create`.
      *
      * @name Adapter#create
      * @method
@@ -544,7 +602,38 @@
      * @return {Promise}
      */
     create: function create(mapper, props, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      var op = void 0;
+      props || (props = {});
+      opts || (opts = {});
+
+      // beforeCreate lifecycle hook
+      op = opts.op = 'beforeCreate';
+      return resolve(self[op](mapper, props, opts)).then(function (_props) {
+        // Allow for re-assignment from lifecycle hook
+        props = isUndefined(_props) ? props : _props;
+        props = withoutRelations(mapper, props);
+        op = opts.op = 'create';
+        self.dbg(op, mapper, props, opts);
+        return resolve(self._create(mapper, props, opts));
+      }).then(function (results) {
+        var _results = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results[0];
+        var result = _results[1];
+
+        result || (result = {});
+        var response = new Response(data, result, 'create');
+        response.created = data ? 1 : 0;
+        response = self.respond(response, opts);
+
+        // afterCreate lifecycle hook
+        op = opts.op = 'afterCreate';
+        return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -561,7 +650,41 @@
      * @return {Promise}
      */
     createMany: function createMany(mapper, props, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      var op = void 0;
+      props || (props = {});
+      opts || (opts = {});
+
+      // beforeCreateMany lifecycle hook
+      op = opts.op = 'beforeCreateMany';
+      return resolve(self[op](mapper, props, opts)).then(function (_props) {
+        // Allow for re-assignment from lifecycle hook
+        props = isUndefined(_props) ? props : _props;
+        props = props.map(function (record) {
+          return withoutRelations(mapper, record);
+        });
+        op = opts.op = 'createMany';
+        self.dbg(op, mapper, props, opts);
+        return resolve(self._createMany(mapper, props, opts));
+      }).then(function (results) {
+        var _results2 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results2[0];
+        var result = _results2[1];
+
+        data || (data = []);
+        result || (result = {});
+        var response = new Response(data, result, 'createMany');
+        response.created = data.length;
+        response = self.respond(response, opts);
+
+        // afterCreateMany lifecycle hook
+        op = opts.op = 'afterCreateMany';
+        return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -579,7 +702,33 @@
      * @return {Promise}
      */
     destroy: function destroy(mapper, id, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      var op = void 0;
+      opts || (opts = {});
+
+      // beforeDestroy lifecycle hook
+      op = opts.op = 'beforeDestroy';
+      return resolve(self[op](mapper, id, opts)).then(function () {
+        op = opts.op = 'destroy';
+        self.dbg(op, mapper, id, opts);
+        return resolve(self._destroy(mapper, id, opts));
+      }).then(function (results) {
+        var _results3 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results3[0];
+        var result = _results3[1];
+
+        result || (result = {});
+        var response = new Response(data, result, 'destroy');
+        response = self.respond(response, opts);
+
+        // afterDestroy lifecycle hook
+        op = opts.op = 'afterDestroy';
+        return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -603,7 +752,34 @@
      * @return {Promise}
      */
     destroyAll: function destroyAll(mapper, query, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      var op = void 0;
+      query || (query = {});
+      opts || (opts = {});
+
+      // beforeDestroyAll lifecycle hook
+      op = opts.op = 'beforeDestroyAll';
+      return resolve(self[op](mapper, query, opts)).then(function () {
+        op = opts.op = 'destroyAll';
+        self.dbg(op, mapper, query, opts);
+        return resolve(self._destroyAll(mapper, query, opts));
+      }).then(function (results) {
+        var _results4 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results4[0];
+        var result = _results4[1];
+
+        result || (result = {});
+        var response = new Response(data, result, 'destroyAll');
+        response = self.respond(response, opts);
+
+        // afterDestroyAll lifecycle hook
+        op = opts.op = 'afterDestroyAll';
+        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -687,6 +863,105 @@
         });
       });
     },
+    loadHasManyLocalKeys: function loadHasManyLocalKeys(mapper, def, records, __opts) {
+      var self = this;
+      var record = void 0;
+      var relatedMapper = def.getRelation();
+
+      if (isObject(records) && !isArray(records)) {
+        record = records;
+      }
+
+      if (record) {
+        var localKeys = [];
+        var itemKeys = get(record, def.localKeys) || [];
+        itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+        localKeys = localKeys.concat(itemKeys);
+        return self.findAll(relatedMapper, {
+          where: babelHelpers.defineProperty({}, relatedMapper.idAttribute, {
+            'in': unique(localKeys).filter(function (x) {
+              return x;
+            })
+          })
+        }, __opts).then(function (relatedItems) {
+          def.setLocalField(record, relatedItems);
+        });
+      } else {
+        var _ret = function () {
+          var localKeys = [];
+          records.forEach(function (item) {
+            var itemKeys = item[def.localKeys] || [];
+            itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+            localKeys = localKeys.concat(itemKeys);
+          });
+          return {
+            v: self.findAll(relatedMapper, {
+              where: babelHelpers.defineProperty({}, relatedMapper.idAttribute, {
+                'in': unique(localKeys).filter(function (x) {
+                  return x;
+                })
+              })
+            }, __opts).then(function (relatedItems) {
+              records.forEach(function (item) {
+                var attached = [];
+                var itemKeys = get(item, def.localKeys) || [];
+                itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+                relatedItems.forEach(function (relatedItem) {
+                  if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
+                    attached.push(relatedItem);
+                  }
+                });
+                def.setLocalField(item, attached);
+              });
+              return relatedItems;
+            })
+          };
+        }();
+
+        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
+      }
+    },
+    loadHasManyForeignKeys: function loadHasManyForeignKeys(mapper, def, records, __opts) {
+      var self = this;
+      var relatedMapper = def.getRelation();
+      var idAttribute = mapper.idAttribute;
+      var record = void 0;
+
+      if (isObject(records) && !isArray(records)) {
+        record = records;
+      }
+
+      if (record) {
+        return self.findAll(def.getRelation(), {
+          where: babelHelpers.defineProperty({}, def.foreignKeys, {
+            'contains': self.makeHasManyForeignKeys(mapper, def, record)
+          })
+        }, __opts).then(function (relatedItems) {
+          def.setLocalField(record, relatedItems);
+        });
+      } else {
+        return self.findAll(relatedMapper, {
+          where: babelHelpers.defineProperty({}, def.foreignKeys, {
+            'isectNotEmpty': records.map(function (record) {
+              return self.makeHasManyForeignKeys(mapper, def, record);
+            })
+          })
+        }, __opts).then(function (relatedItems) {
+          var foreignKeysField = def.foreignKeys;
+          records.forEach(function (record) {
+            var _relatedItems = [];
+            var id = get(record, idAttribute);
+            relatedItems.forEach(function (relatedItem) {
+              var foreignKeys = get(relatedItems, foreignKeysField) || [];
+              if (foreignKeys.indexOf(id) !== -1) {
+                _relatedItems.push(relatedItem);
+              }
+            });
+            def.setLocalField(record, _relatedItems);
+          });
+        });
+      }
+    },
 
 
     /**
@@ -741,7 +1016,7 @@
       var relationDef = def.getRelation();
 
       if (isObject(records) && !isArray(records)) {
-        var _ret = function () {
+        var _ret2 = function () {
           var record = records;
           return {
             v: self.find(relationDef, self.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
@@ -750,7 +1025,7 @@
           };
         }();
 
-        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
+        if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
       } else {
         var keys = records.map(function (record) {
           return self.makeBelongsToForeignKey(mapper, def, record);
@@ -788,7 +1063,62 @@
      * @return {Promise}
      */
     find: function find(mapper, id, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      var record = void 0,
+          op = void 0;
+      opts || (opts = {});
+      opts.with || (opts.with = []);
+
+      // beforeFind lifecycle hook
+      op = opts.op = 'beforeFind';
+      return resolve(self[op](mapper, id, opts)).then(function () {
+        op = opts.op = 'find';
+        self.dbg(op, mapper, id, opts);
+        return resolve(self._find(mapper, id, opts));
+      }).then(function (results) {
+        var _results5 = babelHelpers.slicedToArray(results, 1);
+
+        var _record = _results5[0];
+
+        if (!_record) {
+          return;
+        }
+        record = _record;
+        var tasks = [];
+
+        forEachRelation(mapper, opts, function (def, __opts) {
+          var task = void 0;
+          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+            if (def.type === 'hasOne') {
+              task = self.loadHasOne(mapper, def, record, __opts);
+            } else {
+              task = self.loadHasMany(mapper, def, record, __opts);
+            }
+          } else if (def.type === 'hasMany' && def.localKeys) {
+            task = self.loadHasManyLocalKeys(mapper, def, record, __opts);
+          } else if (def.type === 'hasMany' && def.foreignKeys) {
+            task = self.loadHasManyForeignKeys(mapper, def, record, __opts);
+          } else if (def.type === 'belongsTo') {
+            task = self.loadBelongsTo(mapper, def, record, __opts);
+          }
+          if (task) {
+            tasks.push(task);
+          }
+        });
+
+        return Promise.all(tasks);
+      }).then(function () {
+        var response = new Response(record, {}, 'find');
+        response.found = record ? 1 : 0;
+        response = self.respond(response, opts);
+
+        // afterFind lifecycle hook
+        op = opts.op = 'afterFind';
+        return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -812,7 +1142,58 @@
      * @return {Promise}
      */
     findAll: function findAll(mapper, query, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      opts || (opts = {});
+      opts.with || (opts.with = []);
+
+      var records = [];
+      var op = void 0;
+      // beforeFindAll lifecycle hook
+      op = opts.op = 'beforeFindAll';
+      return resolve(self[op](mapper, query, opts)).then(function () {
+        op = opts.op = 'findAll';
+        self.dbg(op, mapper, query, opts);
+        return resolve(self._findAll(mapper, query, opts));
+      }).then(function (results) {
+        var _results6 = babelHelpers.slicedToArray(results, 1);
+
+        var _records = _results6[0];
+
+        _records || (_records = []);
+        records = _records;
+        var tasks = [];
+        forEachRelation(mapper, opts, function (def, __opts) {
+          var task = void 0;
+          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+            if (def.type === 'hasMany') {
+              task = self.loadHasMany(mapper, def, records, __opts);
+            } else {
+              task = self.loadHasOne(mapper, def, records, __opts);
+            }
+          } else if (def.type === 'hasMany' && def.localKeys) {
+            task = self.loadHasManyLocalKeys(mapper, def, records, __opts);
+          } else if (def.type === 'hasMany' && def.foreignKeys) {
+            task = self.loadHasManyForeignKeys(mapper, def, records, __opts);
+          } else if (def.type === 'belongsTo') {
+            task = self.loadBelongsTo(mapper, def, records, __opts);
+          }
+          if (task) {
+            tasks.push(task);
+          }
+        });
+        return Promise.all(tasks);
+      }).then(function () {
+        var response = new Response(records, {}, 'findAll');
+        response.found = records.length;
+        response = self.respond(response, opts);
+
+        // afterFindAll lifecycle hook
+        op = opts.op = 'afterFindAll';
+        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -894,7 +1275,37 @@
      * @return {Promise}
      */
     update: function update(mapper, id, props, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      props || (props = {});
+      opts || (opts = {});
+      var op = void 0;
+
+      // beforeUpdate lifecycle hook
+      op = opts.op = 'beforeUpdate';
+      return resolve(self[op](mapper, id, props, opts)).then(function (_props) {
+        // Allow for re-assignment from lifecycle hook
+        props = isUndefined(_props) ? props : _props;
+        op = opts.op = 'update';
+        self.dbg(op, mapper, id, props, opts);
+        return resolve(self._update(mapper, id, props, opts));
+      }).then(function (results) {
+        var _results7 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results7[0];
+        var result = _results7[1];
+
+        result || (result = {});
+        var response = new Response(data, result, 'update');
+        response.updated = data ? 1 : 0;
+        response = self.respond(response, opts);
+
+        // afterUpdate lifecycle hook
+        op = opts.op = 'afterUpdate';
+        return resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -919,7 +1330,39 @@
      * @return {Promise}
      */
     updateAll: function updateAll(mapper, props, query, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      props || (props = {});
+      query || (query = {});
+      opts || (opts = {});
+      var op = void 0;
+
+      // beforeUpdateAll lifecycle hook
+      op = opts.op = 'beforeUpdateAll';
+      return resolve(self[op](mapper, props, query, opts)).then(function (_props) {
+        // Allow for re-assignment from lifecycle hook
+        props = isUndefined(_props) ? props : _props;
+        op = opts.op = 'updateAll';
+        self.dbg(op, mapper, props, query, opts);
+        return resolve(self._updateAll(mapper, props, query, opts));
+      }).then(function (results) {
+        var _results8 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results8[0];
+        var result = _results8[1];
+
+        data || (data = []);
+        result || (result = {});
+        var response = new Response(data, result, 'updateAll');
+        response.updated = data.length;
+        response = self.respond(response, opts);
+
+        // afterUpdateAll lifecycle hook
+        op = opts.op = 'afterUpdateAll';
+        return resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     },
 
 
@@ -936,13 +1379,50 @@
      * @return {Promise}
      */
     updateMany: function updateMany(mapper, records, opts) {
-      throw new Error('Not supported!');
+      var self = this;
+      records || (records = []);
+      opts || (opts = {});
+      var op = void 0;
+      var idAttribute = mapper.idAttribute;
+
+      records = records.filter(function (record) {
+        return get(record, idAttribute);
+      });
+
+      // beforeUpdateMany lifecycle hook
+      op = opts.op = 'beforeUpdateMany';
+      return resolve(self[op](mapper, records, opts)).then(function (_records) {
+        // Allow for re-assignment from lifecycle hook
+        records = isUndefined(_records) ? records : _records;
+        records = records.map(function (record) {
+          return withoutRelations(mapper, record);
+        });
+        op = opts.op = 'updateMany';
+        self.dbg(op, mapper, records, opts);
+        return resolve(self._updateMany(mapper, records, opts));
+      }).then(function (results) {
+        var _results9 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results9[0];
+        var result = _results9[1];
+
+        data || (data = []);
+        result || (result = {});
+        var response = new Response(data, result, 'updateMany');
+        response.updated = data.length;
+        response = self.respond(response, opts);
+
+        // afterUpdateMany lifecycle hook
+        op = opts.op = 'afterUpdateMany';
+        return resolve(self[op](mapper, records, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
     }
   });
 
-  exports.reserved = reserved;
-  exports.Response = Response;
-  exports['default'] = Adapter;
+  module.exports = Adapter;
 
 }));
 //# sourceMappingURL=js-data-adapter.js.map

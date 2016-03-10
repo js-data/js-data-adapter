@@ -4,7 +4,7 @@ module.exports = {
   moduleName: 'Adapter',
   moduleId: 'js-data-adapter',
   globals: {
-    'js-data': 'js-data'
+    'js-data': 'JSData'
   },
   plugins: [
     babel({

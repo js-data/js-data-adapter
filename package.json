@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
   "description": "Base adapter class that all other js-data adapters extend.",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -22,19 +22,31 @@
     "lint": "repo-tools lint src/index.js rollup.config.js",
     "bundle": "rollup -c rollup.config.js -f umd -o dist/js-data-adapter.js -m dist/js-data-adapter.js.map src/index.js",
     "watch": "watch \"npm run bundle\" src/",
-    "test": "npm run lint && npm run bundle",
+    "build": "npm run lint && npm run bundle",
+    "mocha": "mocha -t 30000 -R dot -r source-map-support/register mocha.start.js",
+    "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 30000 -R dot -r source-map-support/register mocha.start.js",
+    "test": "npm run build && npm run cover",
     "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
-    "release": "npm test && npm run repo-tools"
+    "release": "npm test && npm run repo-tools",
+    "ci": "npm run test && cat coverage/lcov.info | coveralls || true"
   },
   "peerDependencies": {
     "js-data": "^3.0.0-alpha.16"
   },
   "devDependencies": {
     "babel-core": "6.7.0",
+    "babel-polyfill": "6.6.1",
     "babel-preset-es2015-rollup": "1.1.1",
+    "chai": "3.5.0",
+    "coveralls": "2.11.8",
+    "istanbul": "0.4.2",
+    "js-data-adapter-tests": "^2.0.0-alpha.14",
     "js-data-repo-tools": "0.2.0",
+    "mocha": "2.4.5",
     "rollup": "0.25.4",
     "rollup-plugin-babel": "2.4.0",
+    "sinon": "1.17.3",
+    "source-map-support": "0.4.0",
     "watch": "0.17.1"
   }
 }

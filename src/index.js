@@ -4,22 +4,15 @@ const {
   addHiddenPropsToTarget,
   extend,
   fillIn,
+  forEachRelation,
   get,
   isArray,
   isObject,
   isUndefined,
+  omit,
   plainCopy,
   resolve
 } = utils
-
-export const reserved = [
-  'orderBy',
-  'sort',
-  'limit',
-  'offset',
-  'skip',
-  'where'
-]
 
 const noop = function (...args) {
   const self = this
@@ -33,6 +26,23 @@ const noop2 = function (...args) {
   const opts = args[args.length - 2]
   self.dbg(opts.op, ...args)
   return resolve()
+}
+
+const unique = function (array) {
+  const seen = {}
+  const final = []
+  array.forEach(function (item) {
+    if (item in seen) {
+      return
+    }
+    final.push(item)
+    seen[item] = 0
+  })
+  return final
+}
+
+const withoutRelations = function (mapper, props) {
+  return omit(props, mapper.relationFields || [])
 }
 
 const DEFAULTS = {
@@ -56,23 +66,6 @@ const DEFAULTS = {
 }
 
 /**
- * Response object used when `raw` is `true`. May contain other fields in
- * addition to `data`.
- *
- * @typedef {Object} Response
- * @property {Object} data Response data.
- * @property {string} op The operation for which the response was created.
- */
-
-export function Response (data, meta, op) {
-  const self = this
-  meta || (meta = {})
-  self.data = data
-  fillIn(self, meta)
-  self.op = op
-}
-
-/**
  * Abstract class meant to be extended by adapters.
  *
  * @class Adapter
@@ -82,12 +75,39 @@ export function Response (data, meta, op) {
  * @param {boolean} [opts.raw=false] Whether to return a more detailed response
  * object.
  */
-export default function Adapter (opts) {
+function Adapter (opts) {
   const self = this
   opts || (opts = {})
   fillIn(opts, DEFAULTS)
   fillIn(self, opts)
 }
+
+Adapter.reserved = [
+  'orderBy',
+  'sort',
+  'limit',
+  'offset',
+  'skip',
+  'where'
+]
+
+/**
+ * Response object used when `raw` is `true`. May contain other fields in
+ * addition to `data`.
+ *
+ * @typedef {Object} Response
+ * @property {Object} data Response data.
+ * @property {string} op The operation for which the response was created.
+ */
+function Response (data, meta, op) {
+  const self = this
+  meta || (meta = {})
+  self.data = data
+  fillIn(self, meta)
+  self.op = op
+}
+
+Adapter.Response = Response
 
 /**
  * Alternative to ES6 class syntax for extending `Adapter`.
@@ -497,7 +517,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
   },
 
   /**
-   * Create a new record.  Called by `Mapper#create`.
+   * Create a new record. Called by `Mapper#create`.
    *
    * @name Adapter#create
    * @method
@@ -509,7 +529,34 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   create (mapper, props, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    let op
+    props || (props = {})
+    opts || (opts = {})
+
+    // beforeCreate lifecycle hook
+    op = opts.op = 'beforeCreate'
+    return resolve(self[op](mapper, props, opts)).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      props = isUndefined(_props) ? props : _props
+      props = withoutRelations(mapper, props)
+      op = opts.op = 'create'
+      self.dbg(op, mapper, props, opts)
+      return resolve(self._create(mapper, props, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      result || (result = {})
+      let response = new Response(data, result, 'create')
+      response.created = data ? 1 : 0
+      response = self.respond(response, opts)
+
+      // afterCreate lifecycle hook
+      op = opts.op = 'afterCreate'
+      return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -525,7 +572,37 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   createMany (mapper, props, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    let op
+    props || (props = {})
+    opts || (opts = {})
+
+    // beforeCreateMany lifecycle hook
+    op = opts.op = 'beforeCreateMany'
+    return resolve(self[op](mapper, props, opts)).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      props = isUndefined(_props) ? props : _props
+      props = props.map(function (record) {
+        return withoutRelations(mapper, record)
+      })
+      op = opts.op = 'createMany'
+      self.dbg(op, mapper, props, opts)
+      return resolve(self._createMany(mapper, props, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      data || (data = [])
+      result || (result = {})
+      let response = new Response(data, result, 'createMany')
+      response.created = data.length
+      response = self.respond(response, opts)
+
+      // afterCreateMany lifecycle hook
+      op = opts.op = 'afterCreateMany'
+      return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -542,7 +619,29 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   destroy (mapper, id, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    let op
+    opts || (opts = {})
+
+    // beforeDestroy lifecycle hook
+    op = opts.op = 'beforeDestroy'
+    return resolve(self[op](mapper, id, opts)).then(function () {
+      op = opts.op = 'destroy'
+      self.dbg(op, mapper, id, opts)
+      return resolve(self._destroy(mapper, id, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      result || (result = {})
+      let response = new Response(data, result, 'destroy')
+      response = self.respond(response, opts)
+
+      // afterDestroy lifecycle hook
+      op = opts.op = 'afterDestroy'
+      return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -565,7 +664,30 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   destroyAll (mapper, query, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    let op
+    query || (query = {})
+    opts || (opts = {})
+
+    // beforeDestroyAll lifecycle hook
+    op = opts.op = 'beforeDestroyAll'
+    return resolve(self[op](mapper, query, opts)).then(function () {
+      op = opts.op = 'destroyAll'
+      self.dbg(op, mapper, query, opts)
+      return resolve(self._destroyAll(mapper, query, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      result || (result = {})
+      let response = new Response(data, result, 'destroyAll')
+      response = self.respond(response, opts)
+
+      // afterDestroyAll lifecycle hook
+      op = opts.op = 'afterDestroyAll'
+      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -645,6 +767,105 @@ addHiddenPropsToTarget(Adapter.prototype, {
         def.setLocalField(record, attached)
       })
     })
+  },
+
+  loadHasManyLocalKeys (mapper, def, records, __opts) {
+    const self = this
+    let record
+    const relatedMapper = def.getRelation()
+
+    if (isObject(records) && !isArray(records)) {
+      record = records
+    }
+
+    if (record) {
+      let localKeys = []
+      let itemKeys = get(record, def.localKeys) || []
+      itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+      localKeys = localKeys.concat(itemKeys)
+      return self.findAll(relatedMapper, {
+        where: {
+          [relatedMapper.idAttribute]: {
+            'in': unique(localKeys).filter(function (x) { return x })
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        def.setLocalField(record, relatedItems)
+      })
+    } else {
+      let localKeys = []
+      records.forEach(function (item) {
+        let itemKeys = item[def.localKeys] || []
+        itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+        localKeys = localKeys.concat(itemKeys)
+      })
+      return self.findAll(relatedMapper, {
+        where: {
+          [relatedMapper.idAttribute]: {
+            'in': unique(localKeys).filter(function (x) { return x })
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        records.forEach(function (item) {
+          let attached = []
+          let itemKeys = get(item, def.localKeys) || []
+          itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+          relatedItems.forEach(function (relatedItem) {
+            if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
+              attached.push(relatedItem)
+            }
+          })
+          def.setLocalField(item, attached)
+        })
+        return relatedItems
+      })
+    }
+  },
+
+  loadHasManyForeignKeys (mapper, def, records, __opts) {
+    const self = this
+    const relatedMapper = def.getRelation()
+    const idAttribute = mapper.idAttribute
+    let record
+
+    if (isObject(records) && !isArray(records)) {
+      record = records
+    }
+
+    if (record) {
+      return self.findAll(def.getRelation(), {
+        where: {
+          [def.foreignKeys]: {
+            'contains': self.makeHasManyForeignKeys(mapper, def, record)
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        def.setLocalField(record, relatedItems)
+      })
+    } else {
+      return self.findAll(relatedMapper, {
+        where: {
+          [def.foreignKeys]: {
+            'isectNotEmpty': records.map(function (record) {
+              return self.makeHasManyForeignKeys(mapper, def, record)
+            })
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        const foreignKeysField = def.foreignKeys
+        records.forEach(function (record) {
+          const _relatedItems = []
+          const id = get(record, idAttribute)
+          relatedItems.forEach(function (relatedItem) {
+            const foreignKeys = get(relatedItems, foreignKeysField) || []
+            if (foreignKeys.indexOf(id) !== -1) {
+              _relatedItems.push(relatedItem)
+            }
+          })
+          def.setLocalField(record, _relatedItems)
+        })
+      })
+    }
   },
 
   /**
@@ -739,7 +960,58 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   find (mapper, id, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    let record, op
+    opts || (opts = {})
+    opts.with || (opts.with = [])
+
+    // beforeFind lifecycle hook
+    op = opts.op = 'beforeFind'
+    return resolve(self[op](mapper, id, opts)).then(function () {
+      op = opts.op = 'find'
+      self.dbg(op, mapper, id, opts)
+      return resolve(self._find(mapper, id, opts))
+    }).then(function (results) {
+      let [_record] = results
+      if (!_record) {
+        return
+      }
+      record = _record
+      const tasks = []
+
+      forEachRelation(mapper, opts, function (def, __opts) {
+        let task
+        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+          if (def.type === 'hasOne') {
+            task = self.loadHasOne(mapper, def, record, __opts)
+          } else {
+            task = self.loadHasMany(mapper, def, record, __opts)
+          }
+        } else if (def.type === 'hasMany' && def.localKeys) {
+          task = self.loadHasManyLocalKeys(mapper, def, record, __opts)
+        } else if (def.type === 'hasMany' && def.foreignKeys) {
+          task = self.loadHasManyForeignKeys(mapper, def, record, __opts)
+        } else if (def.type === 'belongsTo') {
+          task = self.loadBelongsTo(mapper, def, record, __opts)
+        }
+        if (task) {
+          tasks.push(task)
+        }
+      })
+
+      return Promise.all(tasks)
+    }).then(function () {
+      let response = new Response(record, {}, 'find')
+      response.found = record ? 1 : 0
+      response = self.respond(response, opts)
+
+      // afterFind lifecycle hook
+      op = opts.op = 'afterFind'
+      return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -762,7 +1034,55 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   findAll (mapper, query, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    opts || (opts = {})
+    opts.with || (opts.with = [])
+
+    let records = []
+    let op
+    // beforeFindAll lifecycle hook
+    op = opts.op = 'beforeFindAll'
+    return resolve(self[op](mapper, query, opts)).then(function () {
+      op = opts.op = 'findAll'
+      self.dbg(op, mapper, query, opts)
+      return resolve(self._findAll(mapper, query, opts))
+    }).then(function (results) {
+      let [_records] = results
+      _records || (_records = [])
+      records = _records
+      const tasks = []
+      forEachRelation(mapper, opts, function (def, __opts) {
+        let task
+        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+          if (def.type === 'hasMany') {
+            task = self.loadHasMany(mapper, def, records, __opts)
+          } else {
+            task = self.loadHasOne(mapper, def, records, __opts)
+          }
+        } else if (def.type === 'hasMany' && def.localKeys) {
+          task = self.loadHasManyLocalKeys(mapper, def, records, __opts)
+        } else if (def.type === 'hasMany' && def.foreignKeys) {
+          task = self.loadHasManyForeignKeys(mapper, def, records, __opts)
+        } else if (def.type === 'belongsTo') {
+          task = self.loadBelongsTo(mapper, def, records, __opts)
+        }
+        if (task) {
+          tasks.push(task)
+        }
+      })
+      return Promise.all(tasks)
+    }).then(function () {
+      let response = new Response(records, {}, 'findAll')
+      response.found = records.length
+      response = self.respond(response, opts)
+
+      // afterFindAll lifecycle hook
+      op = opts.op = 'afterFindAll'
+      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -832,7 +1152,33 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   update (mapper, id, props, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    props || (props = {})
+    opts || (opts = {})
+    let op
+
+    // beforeUpdate lifecycle hook
+    op = opts.op = 'beforeUpdate'
+    return resolve(self[op](mapper, id, props, opts)).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      props = isUndefined(_props) ? props : _props
+      op = opts.op = 'update'
+      self.dbg(op, mapper, id, props, opts)
+      return resolve(self._update(mapper, id, props, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      result || (result = {})
+      let response = new Response(data, result, 'update')
+      response.updated = data ? 1 : 0
+      response = self.respond(response, opts)
+
+      // afterUpdate lifecycle hook
+      op = opts.op = 'afterUpdate'
+      return resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -856,7 +1202,35 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   updateAll (mapper, props, query, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    props || (props = {})
+    query || (query = {})
+    opts || (opts = {})
+    let op
+
+    // beforeUpdateAll lifecycle hook
+    op = opts.op = 'beforeUpdateAll'
+    return resolve(self[op](mapper, props, query, opts)).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      props = isUndefined(_props) ? props : _props
+      op = opts.op = 'updateAll'
+      self.dbg(op, mapper, props, query, opts)
+      return resolve(self._updateAll(mapper, props, query, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      data || (data = [])
+      result || (result = {})
+      let response = new Response(data, result, 'updateAll')
+      response.updated = data.length
+      response = self.respond(response, opts)
+
+      // afterUpdateAll lifecycle hook
+      op = opts.op = 'afterUpdateAll'
+      return resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -872,6 +1246,43 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   updateMany (mapper, records, opts) {
-    throw new Error('Not supported!')
+    const self = this
+    records || (records = [])
+    opts || (opts = {})
+    let op
+    const idAttribute = mapper.idAttribute
+
+    records = records.filter(function (record) {
+      return get(record, idAttribute)
+    })
+
+    // beforeUpdateMany lifecycle hook
+    op = opts.op = 'beforeUpdateMany'
+    return resolve(self[op](mapper, records, opts)).then(function (_records) {
+      // Allow for re-assignment from lifecycle hook
+      records = isUndefined(_records) ? records : _records
+      records = records.map(function (record) {
+        return withoutRelations(mapper, record)
+      })
+      op = opts.op = 'updateMany'
+      self.dbg(op, mapper, records, opts)
+      return resolve(self._updateMany(mapper, records, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      data || (data = [])
+      result || (result = {})
+      let response = new Response(data, result, 'updateMany')
+      response.updated = data.length
+      response = self.respond(response, opts)
+
+      // afterUpdateMany lifecycle hook
+      op = opts.op = 'afterUpdateMany'
+      return resolve(self[op](mapper, records, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   }
 })
+
+module.exports = Adapter
