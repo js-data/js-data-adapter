@@ -801,6 +801,26 @@
 
 
     /**
+     * Return the localKeys from the given record for the provided relationship.
+     *
+     * Override with care.
+     *
+     * @name Adapter#makeHasManyLocalKeys
+     * @method
+     * @return {*}
+     */
+    makeHasManyLocalKeys: function makeHasManyLocalKeys(mapper, def, record) {
+      var localKeys = [];
+      var itemKeys = get(record, def.localKeys) || [];
+      itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+      localKeys = localKeys.concat(itemKeys);
+      return unique(localKeys).filter(function (x) {
+        return x;
+      });
+    },
+
+
+    /**
      * Return the foreignKeys from the given record for the provided relationship.
      *
      * Override with care.
@@ -873,15 +893,9 @@
       }
 
       if (record) {
-        var localKeys = [];
-        var itemKeys = get(record, def.localKeys) || [];
-        itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
-        localKeys = localKeys.concat(itemKeys);
         return self.findAll(relatedMapper, {
           where: babelHelpers.defineProperty({}, relatedMapper.idAttribute, {
-            'in': unique(localKeys).filter(function (x) {
-              return x;
-            })
+            'in': self.makeHasManyLocalKeys(mapper, def, record)
           })
         }, __opts).then(function (relatedItems) {
           def.setLocalField(record, relatedItems);
@@ -889,10 +903,8 @@
       } else {
         var _ret = function () {
           var localKeys = [];
-          records.forEach(function (item) {
-            var itemKeys = item[def.localKeys] || [];
-            itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
-            localKeys = localKeys.concat(itemKeys);
+          records.forEach(function (record) {
+            localKeys = localKeys.concat(self.self.makeHasManyLocalKeys(mapper, def, record));
           });
           return {
             v: self.findAll(relatedMapper, {

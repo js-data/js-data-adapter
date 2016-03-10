@@ -707,6 +707,23 @@ addHiddenPropsToTarget(Adapter.prototype, {
   },
 
   /**
+   * Return the localKeys from the given record for the provided relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#makeHasManyLocalKeys
+   * @method
+   * @return {*}
+   */
+  makeHasManyLocalKeys (mapper, def, record) {
+    let localKeys = []
+    let itemKeys = get(record, def.localKeys) || []
+    itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+    localKeys = localKeys.concat(itemKeys)
+    return unique(localKeys).filter(function (x) { return x })
+  },
+
+  /**
    * Return the foreignKeys from the given record for the provided relationship.
    *
    * Override with care.
@@ -779,14 +796,10 @@ addHiddenPropsToTarget(Adapter.prototype, {
     }
 
     if (record) {
-      let localKeys = []
-      let itemKeys = get(record, def.localKeys) || []
-      itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
-      localKeys = localKeys.concat(itemKeys)
       return self.findAll(relatedMapper, {
         where: {
           [relatedMapper.idAttribute]: {
-            'in': unique(localKeys).filter(function (x) { return x })
+            'in': self.makeHasManyLocalKeys(mapper, def, record)
           }
         }
       }, __opts).then(function (relatedItems) {
@@ -794,10 +807,8 @@ addHiddenPropsToTarget(Adapter.prototype, {
       })
     } else {
       let localKeys = []
-      records.forEach(function (item) {
-        let itemKeys = item[def.localKeys] || []
-        itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
-        localKeys = localKeys.concat(itemKeys)
+      records.forEach(function (record) {
+        localKeys = localKeys.concat(self.self.makeHasManyLocalKeys(mapper, def, record))
       })
       return self.findAll(relatedMapper, {
         where: {

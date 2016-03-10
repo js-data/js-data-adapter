@@ -1,3 +1,7 @@
+##### 0.2.1 - 10 March 2016
+
+Fix for localKeys
+
 ##### 0.2.0 - 10 March 2016
 
 Pulled a lot more common adapter functionality into js-data-adapter.
