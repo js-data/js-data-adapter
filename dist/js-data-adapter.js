@@ -67,6 +67,7 @@
   babelHelpers;
 
   var addHiddenPropsToTarget = jsData.utils.addHiddenPropsToTarget;
+  var deepFillIn = jsData.utils.deepFillIn;
   var extend = jsData.utils.extend;
   var fillIn = jsData.utils.fillIn;
   var forEachRelation = jsData.utils.forEachRelation;
@@ -1160,6 +1161,17 @@
 
       var records = [];
       var op = void 0;
+      var activeWith = opts._activeWith;
+
+      if (isObject(activeWith)) {
+        var activeQuery = activeWith.query || {};
+        if (activeWith.replace) {
+          query = activeQuery;
+        } else {
+          deepFillIn(query, activeQuery);
+        }
+      }
+
       // beforeFindAll lifecycle hook
       op = opts.op = 'beforeFindAll';
       return resolve(self[op](mapper, query, opts)).then(function () {

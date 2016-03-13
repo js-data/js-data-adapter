@@ -1,3 +1,7 @@
+##### 0.2.2 - 12 March 2016
+
+Added support for filtering on "with" sub queries
+
 ##### 0.2.1 - 10 March 2016
 
 Fix for localKeys

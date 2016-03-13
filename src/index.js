@@ -2,6 +2,7 @@ import {utils} from 'js-data'
 
 const {
   addHiddenPropsToTarget,
+  deepFillIn,
   extend,
   fillIn,
   forEachRelation,
@@ -1051,6 +1052,17 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     let records = []
     let op
+    const activeWith = opts._activeWith
+
+    if (isObject(activeWith)) {
+      const activeQuery = activeWith.query || {}
+      if (activeWith.replace) {
+        query = activeQuery
+      } else {
+        deepFillIn(query, activeQuery)
+      }
+    }
+
     // beforeFindAll lifecycle hook
     op = opts.op = 'beforeFindAll'
     return resolve(self[op](mapper, query, opts)).then(function () {
