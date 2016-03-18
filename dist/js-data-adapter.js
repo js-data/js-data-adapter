@@ -74,6 +74,7 @@
   var get = jsData.utils.get;
   var isArray = jsData.utils.isArray;
   var isObject = jsData.utils.isObject;
+  var isString = jsData.utils.isString;
   var isUndefined = jsData.utils.isUndefined;
   var omit = jsData.utils.omit;
   var plainCopy = jsData.utils.plainCopy;
@@ -192,6 +193,29 @@
   Adapter.extend = extend;
 
   addHiddenPropsToTarget(Adapter.prototype, {
+    /**
+     * Lifecycle method method called by <a href="#count__anchor">count</a>.
+     *
+     * Override this method to add custom behavior for this lifecycle hook.
+     *
+     * Returning a Promise causes <a href="#count__anchor">count</a> to wait for the Promise to resolve before continuing.
+     *
+     * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the count.
+     *
+     * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+     *
+     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#count__anchor">count</a>.
+     *
+     * @name Adapter#afterCount
+     * @method
+     * @param {Object} mapper The `mapper` argument passed to <a href="#count__anchor">count</a>.
+     * @param {Object} props The `props` argument passed to <a href="#count__anchor">count</a>.
+     * @param {Object} opts The `opts` argument passed to <a href="#count__anchor">count</a>.
+     * @property {string} opts.op `afterCount`
+     * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
+     */
+    afterCount: noop2,
+
     /**
      * Lifecycle method method called by <a href="#create__anchor">create</a>.
      *
@@ -331,6 +355,29 @@
     afterFindAll: noop2,
 
     /**
+     * Lifecycle method method called by <a href="#sum__anchor">sum</a>.
+     *
+     * Override this method to add custom behavior for this lifecycle hook.
+     *
+     * Returning a Promise causes <a href="#sum__anchor">sum</a> to wait for the Promise to resolve before continuing.
+     *
+     * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the sum.
+     *
+     * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+     *
+     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#sum__anchor">sum</a>.
+     *
+     * @name Adapter#afterSum
+     * @method
+     * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
+     * @param {Object} props The `props` argument passed to <a href="#sum__anchor">sum</a>.
+     * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
+     * @property {string} opts.op `afterSum`
+     * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
+     */
+    afterSum: noop2,
+
+    /**
      * Lifecycle method method called by <a href="#update__anchor">update</a>.
      *
      * Override this method to add custom behavior for this lifecycle hook.
@@ -400,6 +447,24 @@
      * @param {Object[]|Response} response The updated records or {@link Response}, depending on the value of `opts.raw`.
      */
     afterUpdateMany: noop2,
+
+    /**
+     * Lifecycle method method called by <a href="#count__anchor">count</a>.
+     *
+     * Override this method to add custom behavior for this lifecycle hook.
+     *
+     * Returning a Promise causes <a href="#count__anchor">count</a> to wait for the Promise to resolve before continuing.
+     *
+     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#count__anchor">count</a>.
+     *
+     * @name Adapter#beforeCount
+     * @method
+     * @param {Object} mapper The `mapper` argument passed to <a href="#count__anchor">count</a>.
+     * @param {Object} query The `query` argument passed to <a href="#count__anchor">count</a>.
+     * @param {Object} opts The `opts` argument passed to <a href="#count__anchor">count</a>.
+     * @property {string} opts.op `beforeCount`
+     */
+    beforeCount: noop,
 
     /**
      * Lifecycle method method called by <a href="#create__anchor">create</a>.
@@ -514,6 +579,24 @@
     beforeFindAll: noop,
 
     /**
+     * Lifecycle method method called by <a href="#sum__anchor">sum</a>.
+     *
+     * Override this method to add custom behavior for this lifecycle hook.
+     *
+     * Returning a Promise causes <a href="#sum__anchor">sum</a> to wait for the Promise to resolve before continuing.
+     *
+     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#sum__anchor">sum</a>.
+     *
+     * @name Adapter#beforeSum
+     * @method
+     * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
+     * @param {Object} query The `query` argument passed to <a href="#sum__anchor">sum</a>.
+     * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
+     * @property {string} opts.op `beforeSum`
+     */
+    beforeSum: noop,
+
+    /**
      * Lifecycle method method called by <a href="#update__anchor">update</a>.
      *
      * Override this method to add custom behavior for this lifecycle hook.
@@ -591,6 +674,58 @@
 
 
     /**
+     * Retrieve the number of records that match the selection query. Called by
+     * `Mapper#count`.
+     *
+     * @name Adapter#count
+     * @method
+     * @param {Object} mapper The mapper.
+     * @param {Object} [query] Selection query.
+     * @param {Object} [query.where] Filtering criteria.
+     * @param {string|Array} [query.orderBy] Sorting criteria.
+     * @param {string|Array} [query.sort] Same as `query.sort`.
+     * @param {number} [query.limit] Limit results.
+     * @param {number} [query.skip] Offset results.
+     * @param {number} [query.offset] Same as `query.skip`.
+     * @param {Object} [opts] Configuration options.
+     * @param {boolean} [opts.raw=false] Whether to return a more detailed
+     * response object.
+     * @return {Promise}
+     */
+    count: function count(mapper, query, opts) {
+      var self = this;
+      var op = void 0;
+      query || (query = {});
+      opts || (opts = {});
+
+      // beforeCount lifecycle hook
+      op = opts.op = 'beforeCount';
+      return resolve(self[op](mapper, query, opts)).then(function () {
+        // Allow for re-assignment from lifecycle hook
+        op = opts.op = 'count';
+        self.dbg(op, mapper, query, opts);
+        return resolve(self._count(mapper, query, opts));
+      }).then(function (results) {
+        var _results = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results[0];
+        var result = _results[1];
+
+        result || (result = {});
+        var response = new Response(data, result, op);
+        response = self.respond(response, opts);
+
+        // afterCount lifecycle hook
+        op = opts.op = 'afterCount';
+        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
+    },
+
+
+    /**
      * Create a new record. Called by `Mapper#create`.
      *
      * @name Adapter#create
@@ -618,10 +753,10 @@
         self.dbg(op, mapper, props, opts);
         return resolve(self._create(mapper, props, opts));
       }).then(function (results) {
-        var _results = babelHelpers.slicedToArray(results, 2);
+        var _results2 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results[0];
-        var result = _results[1];
+        var data = _results2[0];
+        var result = _results2[1];
 
         result || (result = {});
         var response = new Response(data, result, 'create');
@@ -668,10 +803,10 @@
         self.dbg(op, mapper, props, opts);
         return resolve(self._createMany(mapper, props, opts));
       }).then(function (results) {
-        var _results2 = babelHelpers.slicedToArray(results, 2);
+        var _results3 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results2[0];
-        var result = _results2[1];
+        var data = _results3[0];
+        var result = _results3[1];
 
         data || (data = []);
         result || (result = {});
@@ -714,10 +849,10 @@
         self.dbg(op, mapper, id, opts);
         return resolve(self._destroy(mapper, id, opts));
       }).then(function (results) {
-        var _results3 = babelHelpers.slicedToArray(results, 2);
+        var _results4 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results3[0];
-        var result = _results3[1];
+        var data = _results4[0];
+        var result = _results4[1];
 
         result || (result = {});
         var response = new Response(data, result, 'destroy');
@@ -765,10 +900,10 @@
         self.dbg(op, mapper, query, opts);
         return resolve(self._destroyAll(mapper, query, opts));
       }).then(function (results) {
-        var _results4 = babelHelpers.slicedToArray(results, 2);
+        var _results5 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results4[0];
-        var result = _results4[1];
+        var data = _results5[0];
+        var result = _results5[1];
 
         result || (result = {});
         var response = new Response(data, result, 'destroyAll');
@@ -1089,9 +1224,9 @@
         self.dbg(op, mapper, id, opts);
         return resolve(self._find(mapper, id, opts));
       }).then(function (results) {
-        var _results5 = babelHelpers.slicedToArray(results, 1);
+        var _results6 = babelHelpers.slicedToArray(results, 1);
 
-        var _record = _results5[0];
+        var _record = _results6[0];
 
         if (!_record) {
           return;
@@ -1179,9 +1314,9 @@
         self.dbg(op, mapper, query, opts);
         return resolve(self._findAll(mapper, query, opts));
       }).then(function (results) {
-        var _results6 = babelHelpers.slicedToArray(results, 1);
+        var _results7 = babelHelpers.slicedToArray(results, 1);
 
-        var _records = _results6[0];
+        var _records = _results7[0];
 
         _records || (_records = []);
         records = _records;
@@ -1272,6 +1407,62 @@
 
 
     /**
+     * Retrieve sum of the specified field of the records that match the selection
+     * query. Called by `Mapper#sum`.
+     *
+     * @name Adapter#sum
+     * @method
+     * @param {Object} mapper The mapper.
+     * @param {string} field By to sum.
+     * @param {Object} [query] Selection query.
+     * @param {Object} [query.where] Filtering criteria.
+     * @param {string|Array} [query.orderBy] Sorting criteria.
+     * @param {string|Array} [query.sort] Same as `query.sort`.
+     * @param {number} [query.limit] Limit results.
+     * @param {number} [query.skip] Offset results.
+     * @param {number} [query.offset] Same as `query.skip`.
+     * @param {Object} [opts] Configuration options.
+     * @param {boolean} [opts.raw=false] Whether to return a more detailed
+     * response object.
+     * @return {Promise}
+     */
+    sum: function sum(mapper, field, query, opts) {
+      var self = this;
+      var op = void 0;
+      if (!isString(field)) {
+        throw new Error('field must be a string!');
+      }
+      query || (query = {});
+      opts || (opts = {});
+
+      // beforeSum lifecycle hook
+      op = opts.op = 'beforeSum';
+      return resolve(self[op](mapper, field, query, opts)).then(function () {
+        // Allow for re-assignment from lifecycle hook
+        op = opts.op = 'sum';
+        self.dbg(op, mapper, field, query, opts);
+        return resolve(self._sum(mapper, field, query, opts));
+      }).then(function (results) {
+        var _results8 = babelHelpers.slicedToArray(results, 2);
+
+        var data = _results8[0];
+        var result = _results8[1];
+
+        result || (result = {});
+        var response = new Response(data, result, op);
+        response = self.respond(response, opts);
+
+        // afterSum lifecycle hook
+        op = opts.op = 'afterSum';
+        return resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
+          // Allow for re-assignment from lifecycle hook
+          return isUndefined(_response) ? response : _response;
+        });
+      });
+    },
+
+
+    /**
      * @name Adapter#respond
      * @method
      * @param {Object} response Response object.
@@ -1313,10 +1504,10 @@
         self.dbg(op, mapper, id, props, opts);
         return resolve(self._update(mapper, id, props, opts));
       }).then(function (results) {
-        var _results7 = babelHelpers.slicedToArray(results, 2);
+        var _results9 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results7[0];
-        var result = _results7[1];
+        var data = _results9[0];
+        var result = _results9[1];
 
         result || (result = {});
         var response = new Response(data, result, 'update');
@@ -1369,10 +1560,10 @@
         self.dbg(op, mapper, props, query, opts);
         return resolve(self._updateAll(mapper, props, query, opts));
       }).then(function (results) {
-        var _results8 = babelHelpers.slicedToArray(results, 2);
+        var _results10 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results8[0];
-        var result = _results8[1];
+        var data = _results10[0];
+        var result = _results10[1];
 
         data || (data = []);
         result || (result = {});
@@ -1425,10 +1616,10 @@
         self.dbg(op, mapper, records, opts);
         return resolve(self._updateMany(mapper, records, opts));
       }).then(function (results) {
-        var _results9 = babelHelpers.slicedToArray(results, 2);
+        var _results11 = babelHelpers.slicedToArray(results, 2);
 
-        var data = _results9[0];
-        var result = _results9[1];
+        var data = _results11[0];
+        var result = _results11[1];
 
         data || (data = []);
         result || (result = {});

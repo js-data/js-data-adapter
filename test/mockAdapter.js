@@ -45,6 +45,11 @@ function getCollection (mapper) {
 }
 
 addHiddenPropsToTarget(MockAdapter.prototype, {
+  _count: function (mapper, query) {
+    var collection = getCollection(mapper)
+    var records = collection.filter(query || {})
+    return [records.length, {}]
+  },
   _create: function (mapper, props) {
     props = plainCopy(props)
     if (isUndefined(props[mapper.idAttribute])) {
@@ -83,6 +88,16 @@ addHiddenPropsToTarget(MockAdapter.prototype, {
   },
   _findAll: function (mapper, query) {
     return [getCollection(mapper).filter(query || {}), {}]
+  },
+  _sum: function (mapper, field, query) {
+    var collection = getCollection(mapper)
+    var records = collection.filter(query || {})
+    var sum = 0
+    records.forEach(function (record) {
+      sum += record[field] || 0
+    })
+
+    return [sum, {}]
   },
   _update: function (mapper, id, props) {
     props = plainCopy(props)

@@ -9,6 +9,7 @@ const {
   get,
   isArray,
   isObject,
+  isString,
   isUndefined,
   omit,
   plainCopy,
@@ -124,6 +125,29 @@ Adapter.Response = Response
 Adapter.extend = extend
 
 addHiddenPropsToTarget(Adapter.prototype, {
+  /**
+   * Lifecycle method method called by <a href="#count__anchor">count</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#count__anchor">count</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the count.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#count__anchor">count</a>.
+   *
+   * @name Adapter#afterCount
+   * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#count__anchor">count</a>.
+   * @param {Object} props The `props` argument passed to <a href="#count__anchor">count</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#count__anchor">count</a>.
+   * @property {string} opts.op `afterCount`
+   * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
+   */
+  afterCount: noop2,
+
   /**
    * Lifecycle method method called by <a href="#create__anchor">create</a>.
    *
@@ -263,6 +287,29 @@ addHiddenPropsToTarget(Adapter.prototype, {
   afterFindAll: noop2,
 
   /**
+   * Lifecycle method method called by <a href="#sum__anchor">sum</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#sum__anchor">sum</a> to wait for the Promise to resolve before continuing.
+   *
+   * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the sum.
+   *
+   * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#sum__anchor">sum</a>.
+   *
+   * @name Adapter#afterSum
+   * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
+   * @param {Object} props The `props` argument passed to <a href="#sum__anchor">sum</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
+   * @property {string} opts.op `afterSum`
+   * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
+   */
+  afterSum: noop2,
+
+  /**
    * Lifecycle method method called by <a href="#update__anchor">update</a>.
    *
    * Override this method to add custom behavior for this lifecycle hook.
@@ -332,6 +379,24 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @param {Object[]|Response} response The updated records or {@link Response}, depending on the value of `opts.raw`.
    */
   afterUpdateMany: noop2,
+
+  /**
+   * Lifecycle method method called by <a href="#count__anchor">count</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#count__anchor">count</a> to wait for the Promise to resolve before continuing.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#count__anchor">count</a>.
+   *
+   * @name Adapter#beforeCount
+   * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#count__anchor">count</a>.
+   * @param {Object} query The `query` argument passed to <a href="#count__anchor">count</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#count__anchor">count</a>.
+   * @property {string} opts.op `beforeCount`
+   */
+  beforeCount: noop,
 
   /**
    * Lifecycle method method called by <a href="#create__anchor">create</a>.
@@ -446,6 +511,24 @@ addHiddenPropsToTarget(Adapter.prototype, {
   beforeFindAll: noop,
 
   /**
+   * Lifecycle method method called by <a href="#sum__anchor">sum</a>.
+   *
+   * Override this method to add custom behavior for this lifecycle hook.
+   *
+   * Returning a Promise causes <a href="#sum__anchor">sum</a> to wait for the Promise to resolve before continuing.
+   *
+   * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#sum__anchor">sum</a>.
+   *
+   * @name Adapter#beforeSum
+   * @method
+   * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
+   * @param {Object} query The `query` argument passed to <a href="#sum__anchor">sum</a>.
+   * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
+   * @property {string} opts.op `beforeSum`
+   */
+  beforeSum: noop,
+
+  /**
    * Lifecycle method method called by <a href="#update__anchor">update</a>.
    *
    * Override this method to add custom behavior for this lifecycle hook.
@@ -515,6 +598,53 @@ addHiddenPropsToTarget(Adapter.prototype, {
    */
   dbg (...args) {
     this.log('debug', ...args)
+  },
+
+  /**
+   * Retrieve the number of records that match the selection query. Called by
+   * `Mapper#count`.
+   *
+   * @name Adapter#count
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @return {Promise}
+   */
+  count (mapper, query, opts) {
+    const self = this
+    let op
+    query || (query = {})
+    opts || (opts = {})
+
+    // beforeCount lifecycle hook
+    op = opts.op = 'beforeCount'
+    return resolve(self[op](mapper, query, opts)).then(function () {
+      // Allow for re-assignment from lifecycle hook
+      op = opts.op = 'count'
+      self.dbg(op, mapper, query, opts)
+      return resolve(self._count(mapper, query, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      result || (result = {})
+      let response = new Response(data, result, op)
+      response = self.respond(response, opts)
+
+      // afterCount lifecycle hook
+      op = opts.op = 'afterCount'
+      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**
@@ -1146,6 +1276,57 @@ addHiddenPropsToTarget(Adapter.prototype, {
     } else {
       console.log(prefix, ...args)
     }
+  },
+
+  /**
+   * Retrieve sum of the specified field of the records that match the selection
+   * query. Called by `Mapper#sum`.
+   *
+   * @name Adapter#sum
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {string} field By to sum.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @return {Promise}
+   */
+  sum (mapper, field, query, opts) {
+    const self = this
+    let op
+    if (!isString(field)) {
+      throw new Error('field must be a string!')
+    }
+    query || (query = {})
+    opts || (opts = {})
+
+    // beforeSum lifecycle hook
+    op = opts.op = 'beforeSum'
+    return resolve(self[op](mapper, field, query, opts)).then(function () {
+      // Allow for re-assignment from lifecycle hook
+      op = opts.op = 'sum'
+      self.dbg(op, mapper, field, query, opts)
+      return resolve(self._sum(mapper, field, query, opts))
+    }).then(function (results) {
+      let [data, result] = results
+      result || (result = {})
+      let response = new Response(data, result, op)
+      response = self.respond(response, opts)
+
+      // afterSum lifecycle hook
+      op = opts.op = 'afterSum'
+      return resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
+        // Allow for re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
+      })
+    })
   },
 
   /**

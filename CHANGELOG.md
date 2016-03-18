@@ -1,3 +1,7 @@
+##### 0.2.3 - 17 March 2016
+
+Added count and sum methods
+
 ##### 0.2.2 - 12 March 2016
 
 Added support for filtering on "with" sub queries
