@@ -1,33 +1,17 @@
 import {utils} from 'js-data'
 
-const {
-  addHiddenPropsToTarget,
-  deepFillIn,
-  extend,
-  fillIn,
-  forEachRelation,
-  get,
-  isArray,
-  isObject,
-  isString,
-  isUndefined,
-  omit,
-  plainCopy,
-  resolve
-} = utils
-
 const noop = function (...args) {
   const self = this
   const opts = args[args.length - 1]
   self.dbg(opts.op, ...args)
-  return resolve()
+  return utils.resolve()
 }
 
 const noop2 = function (...args) {
   const self = this
   const opts = args[args.length - 2]
   self.dbg(opts.op, ...args)
-  return resolve()
+  return utils.resolve()
 }
 
 const unique = function (array) {
@@ -44,7 +28,7 @@ const unique = function (array) {
 }
 
 const withoutRelations = function (mapper, props) {
-  return omit(props, mapper.relationFields || [])
+  return utils.omit(props, mapper.relationFields || [])
 }
 
 const DEFAULTS = {
@@ -80,8 +64,8 @@ const DEFAULTS = {
 function Adapter (opts) {
   const self = this
   opts || (opts = {})
-  fillIn(opts, DEFAULTS)
-  fillIn(self, opts)
+  utils.fillIn(opts, DEFAULTS)
+  utils.fillIn(self, opts)
 }
 
 Adapter.reserved = [
@@ -105,7 +89,7 @@ function Response (data, meta, op) {
   const self = this
   meta || (meta = {})
   self.data = data
-  fillIn(self, meta)
+  utils.fillIn(self, meta)
   self.op = op
 }
 
@@ -122,9 +106,9 @@ Adapter.Response = Response
  * properties to the subclass itself.
  * @return {Object} Subclass of `Adapter`.
  */
-Adapter.extend = extend
+Adapter.extend = utils.extend
 
-addHiddenPropsToTarget(Adapter.prototype, {
+utils.addHiddenPropsToTarget(Adapter.prototype, {
   /**
    * Lifecycle method method called by <a href="#count__anchor">count</a>.
    *
@@ -627,11 +611,11 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeCount lifecycle hook
     op = opts.op = 'beforeCount'
-    return resolve(self[op](mapper, query, opts)).then(function () {
+    return utils.resolve(self[op](mapper, query, opts)).then(function () {
       // Allow for re-assignment from lifecycle hook
       op = opts.op = 'count'
       self.dbg(op, mapper, query, opts)
-      return resolve(self._count(mapper, query, opts))
+      return utils.resolve(self._count(mapper, query, opts))
     }).then(function (results) {
       let [data, result] = results
       result || (result = {})
@@ -640,9 +624,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterCount lifecycle hook
       op = opts.op = 'afterCount'
-      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -667,13 +651,13 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeCreate lifecycle hook
     op = opts.op = 'beforeCreate'
-    return resolve(self[op](mapper, props, opts)).then(function (_props) {
+    return utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      props = isUndefined(_props) ? props : _props
+      props = utils.isUndefined(_props) ? props : _props
       props = withoutRelations(mapper, props)
       op = opts.op = 'create'
       self.dbg(op, mapper, props, opts)
-      return resolve(self._create(mapper, props, opts))
+      return utils.resolve(self._create(mapper, props, opts))
     }).then(function (results) {
       let [data, result] = results
       result || (result = {})
@@ -683,9 +667,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterCreate lifecycle hook
       op = opts.op = 'afterCreate'
-      return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -710,15 +694,15 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeCreateMany lifecycle hook
     op = opts.op = 'beforeCreateMany'
-    return resolve(self[op](mapper, props, opts)).then(function (_props) {
+    return utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      props = isUndefined(_props) ? props : _props
+      props = utils.isUndefined(_props) ? props : _props
       props = props.map(function (record) {
         return withoutRelations(mapper, record)
       })
       op = opts.op = 'createMany'
       self.dbg(op, mapper, props, opts)
-      return resolve(self._createMany(mapper, props, opts))
+      return utils.resolve(self._createMany(mapper, props, opts))
     }).then(function (results) {
       let [data, result] = results
       data || (data = [])
@@ -729,9 +713,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterCreateMany lifecycle hook
       op = opts.op = 'afterCreateMany'
-      return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -756,10 +740,10 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeDestroy lifecycle hook
     op = opts.op = 'beforeDestroy'
-    return resolve(self[op](mapper, id, opts)).then(function () {
+    return utils.resolve(self[op](mapper, id, opts)).then(function () {
       op = opts.op = 'destroy'
       self.dbg(op, mapper, id, opts)
-      return resolve(self._destroy(mapper, id, opts))
+      return utils.resolve(self._destroy(mapper, id, opts))
     }).then(function (results) {
       let [data, result] = results
       result || (result = {})
@@ -768,9 +752,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterDestroy lifecycle hook
       op = opts.op = 'afterDestroy'
-      return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -802,10 +786,10 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeDestroyAll lifecycle hook
     op = opts.op = 'beforeDestroyAll'
-    return resolve(self[op](mapper, query, opts)).then(function () {
+    return utils.resolve(self[op](mapper, query, opts)).then(function () {
       op = opts.op = 'destroyAll'
       self.dbg(op, mapper, query, opts)
-      return resolve(self._destroyAll(mapper, query, opts))
+      return utils.resolve(self._destroyAll(mapper, query, opts))
     }).then(function (results) {
       let [data, result] = results
       result || (result = {})
@@ -814,9 +798,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterDestroyAll lifecycle hook
       op = opts.op = 'afterDestroyAll'
-      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -848,8 +832,8 @@ addHiddenPropsToTarget(Adapter.prototype, {
    */
   makeHasManyLocalKeys (mapper, def, record) {
     let localKeys = []
-    let itemKeys = get(record, def.localKeys) || []
-    itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+    let itemKeys = utils.get(record, def.localKeys) || []
+    itemKeys = utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
     localKeys = localKeys.concat(itemKeys)
     return unique(localKeys).filter(function (x) { return x })
   },
@@ -864,7 +848,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {*}
    */
   makeHasManyForeignKeys (mapper, def, record) {
-    return get(record, mapper.idAttribute)
+    return utils.get(record, mapper.idAttribute)
   },
 
   /**
@@ -880,7 +864,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
     const self = this
     let singular = false
 
-    if (isObject(records) && !isArray(records)) {
+    if (utils.isObject(records) && !utils.isArray(records)) {
       singular = true
       records = [records]
     }
@@ -907,7 +891,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
           attached = relatedItems
         } else {
           relatedItems.forEach(function (relatedItem) {
-            if (get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
+            if (utils.get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
               attached.push(relatedItem)
             }
           })
@@ -922,7 +906,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
     let record
     const relatedMapper = def.getRelation()
 
-    if (isObject(records) && !isArray(records)) {
+    if (utils.isObject(records) && !utils.isArray(records)) {
       record = records
     }
 
@@ -950,8 +934,8 @@ addHiddenPropsToTarget(Adapter.prototype, {
       }, __opts).then(function (relatedItems) {
         records.forEach(function (item) {
           let attached = []
-          let itemKeys = get(item, def.localKeys) || []
-          itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+          let itemKeys = utils.get(item, def.localKeys) || []
+          itemKeys = utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
           relatedItems.forEach(function (relatedItem) {
             if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
               attached.push(relatedItem)
@@ -970,7 +954,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
     const idAttribute = mapper.idAttribute
     let record
 
-    if (isObject(records) && !isArray(records)) {
+    if (utils.isObject(records) && !utils.isArray(records)) {
       record = records
     }
 
@@ -997,9 +981,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
         const foreignKeysField = def.foreignKeys
         records.forEach(function (record) {
           const _relatedItems = []
-          const id = get(record, idAttribute)
+          const id = utils.get(record, idAttribute)
           relatedItems.forEach(function (relatedItem) {
-            const foreignKeys = get(relatedItems, foreignKeysField) || []
+            const foreignKeys = utils.get(relatedItems, foreignKeysField) || []
             if (foreignKeys.indexOf(id) !== -1) {
               _relatedItems.push(relatedItem)
             }
@@ -1020,13 +1004,13 @@ addHiddenPropsToTarget(Adapter.prototype, {
    * @return {Promise}
    */
   loadHasOne (mapper, def, records, __opts) {
-    if (isObject(records) && !isArray(records)) {
+    if (utils.isObject(records) && !utils.isArray(records)) {
       records = [records]
     }
     return this.loadHasMany(mapper, def, records, __opts).then(function () {
       records.forEach(function (record) {
         const relatedData = def.getLocalField(record)
-        if (isArray(relatedData) && relatedData.length) {
+        if (utils.isArray(relatedData) && relatedData.length) {
           def.setLocalField(record, relatedData[0])
         }
       })
@@ -1059,7 +1043,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
     const self = this
     const relationDef = def.getRelation()
 
-    if (isObject(records) && !isArray(records)) {
+    if (utils.isObject(records) && !utils.isArray(records)) {
       const record = records
       return self.find(relationDef, self.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
         def.setLocalField(record, relatedItem)
@@ -1109,10 +1093,10 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeFind lifecycle hook
     op = opts.op = 'beforeFind'
-    return resolve(self[op](mapper, id, opts)).then(function () {
+    return utils.resolve(self[op](mapper, id, opts)).then(function () {
       op = opts.op = 'find'
       self.dbg(op, mapper, id, opts)
-      return resolve(self._find(mapper, id, opts))
+      return utils.resolve(self._find(mapper, id, opts))
     }).then(function (results) {
       let [_record] = results
       if (!_record) {
@@ -1121,7 +1105,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
       record = _record
       const tasks = []
 
-      forEachRelation(mapper, opts, function (def, __opts) {
+      utils.forEachRelation(mapper, opts, function (def, __opts) {
         let task
         if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
           if (def.type === 'hasOne') {
@@ -1149,9 +1133,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterFind lifecycle hook
       op = opts.op = 'afterFind'
-      return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -1184,27 +1168,27 @@ addHiddenPropsToTarget(Adapter.prototype, {
     let op
     const activeWith = opts._activeWith
 
-    if (isObject(activeWith)) {
+    if (utils.isObject(activeWith)) {
       const activeQuery = activeWith.query || {}
       if (activeWith.replace) {
         query = activeQuery
       } else {
-        deepFillIn(query, activeQuery)
+        utils.deepFillIn(query, activeQuery)
       }
     }
 
     // beforeFindAll lifecycle hook
     op = opts.op = 'beforeFindAll'
-    return resolve(self[op](mapper, query, opts)).then(function () {
+    return utils.resolve(self[op](mapper, query, opts)).then(function () {
       op = opts.op = 'findAll'
       self.dbg(op, mapper, query, opts)
-      return resolve(self._findAll(mapper, query, opts))
+      return utils.resolve(self._findAll(mapper, query, opts))
     }).then(function (results) {
       let [_records] = results
       _records || (_records = [])
       records = _records
       const tasks = []
-      forEachRelation(mapper, opts, function (def, __opts) {
+      utils.forEachRelation(mapper, opts, function (def, __opts) {
         let task
         if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
           if (def.type === 'hasMany') {
@@ -1231,9 +1215,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterFindAll lifecycle hook
       op = opts.op = 'afterFindAll'
-      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -1250,7 +1234,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
    */
   getOpt (opt, opts) {
     opts || (opts = {})
-    return isUndefined(opts[opt]) ? plainCopy(this[opt]) : plainCopy(opts[opt])
+    return utils.isUndefined(opts[opt]) ? utils.plainCopy(this[opt]) : utils.plainCopy(opts[opt])
   },
 
   /**
@@ -1301,7 +1285,7 @@ addHiddenPropsToTarget(Adapter.prototype, {
   sum (mapper, field, query, opts) {
     const self = this
     let op
-    if (!isString(field)) {
+    if (!utils.isString(field)) {
       throw new Error('field must be a string!')
     }
     query || (query = {})
@@ -1309,11 +1293,11 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeSum lifecycle hook
     op = opts.op = 'beforeSum'
-    return resolve(self[op](mapper, field, query, opts)).then(function () {
+    return utils.resolve(self[op](mapper, field, query, opts)).then(function () {
       // Allow for re-assignment from lifecycle hook
       op = opts.op = 'sum'
       self.dbg(op, mapper, field, query, opts)
-      return resolve(self._sum(mapper, field, query, opts))
+      return utils.resolve(self._sum(mapper, field, query, opts))
     }).then(function (results) {
       let [data, result] = results
       result || (result = {})
@@ -1322,9 +1306,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterSum lifecycle hook
       op = opts.op = 'afterSum'
-      return resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -1363,12 +1347,12 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeUpdate lifecycle hook
     op = opts.op = 'beforeUpdate'
-    return resolve(self[op](mapper, id, props, opts)).then(function (_props) {
+    return utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      props = isUndefined(_props) ? props : _props
+      props = utils.isUndefined(_props) ? props : _props
       op = opts.op = 'update'
       self.dbg(op, mapper, id, props, opts)
-      return resolve(self._update(mapper, id, props, opts))
+      return utils.resolve(self._update(mapper, id, props, opts))
     }).then(function (results) {
       let [data, result] = results
       result || (result = {})
@@ -1378,9 +1362,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterUpdate lifecycle hook
       op = opts.op = 'afterUpdate'
-      return resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -1414,12 +1398,12 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
     // beforeUpdateAll lifecycle hook
     op = opts.op = 'beforeUpdateAll'
-    return resolve(self[op](mapper, props, query, opts)).then(function (_props) {
+    return utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      props = isUndefined(_props) ? props : _props
+      props = utils.isUndefined(_props) ? props : _props
       op = opts.op = 'updateAll'
       self.dbg(op, mapper, props, query, opts)
-      return resolve(self._updateAll(mapper, props, query, opts))
+      return utils.resolve(self._updateAll(mapper, props, query, opts))
     }).then(function (results) {
       let [data, result] = results
       data || (data = [])
@@ -1430,9 +1414,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterUpdateAll lifecycle hook
       op = opts.op = 'afterUpdateAll'
-      return resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   },
@@ -1457,20 +1441,20 @@ addHiddenPropsToTarget(Adapter.prototype, {
     const idAttribute = mapper.idAttribute
 
     records = records.filter(function (record) {
-      return get(record, idAttribute)
+      return utils.get(record, idAttribute)
     })
 
     // beforeUpdateMany lifecycle hook
     op = opts.op = 'beforeUpdateMany'
-    return resolve(self[op](mapper, records, opts)).then(function (_records) {
+    return utils.resolve(self[op](mapper, records, opts)).then(function (_records) {
       // Allow for re-assignment from lifecycle hook
-      records = isUndefined(_records) ? records : _records
+      records = utils.isUndefined(_records) ? records : _records
       records = records.map(function (record) {
         return withoutRelations(mapper, record)
       })
       op = opts.op = 'updateMany'
       self.dbg(op, mapper, records, opts)
-      return resolve(self._updateMany(mapper, records, opts))
+      return utils.resolve(self._updateMany(mapper, records, opts))
     }).then(function (results) {
       let [data, result] = results
       data || (data = [])
@@ -1481,9 +1465,9 @@ addHiddenPropsToTarget(Adapter.prototype, {
 
       // afterUpdateMany lifecycle hook
       op = opts.op = 'afterUpdateMany'
-      return resolve(self[op](mapper, records, opts, response)).then(function (_response) {
+      return utils.resolve(self[op](mapper, records, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_response) ? response : _response
+        return utils.isUndefined(_response) ? response : _response
       })
     })
   }

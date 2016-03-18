@@ -66,21 +66,6 @@
 
   babelHelpers;
 
-  var addHiddenPropsToTarget = jsData.utils.addHiddenPropsToTarget;
-  var deepFillIn = jsData.utils.deepFillIn;
-  var extend = jsData.utils.extend;
-  var fillIn = jsData.utils.fillIn;
-  var forEachRelation = jsData.utils.forEachRelation;
-  var get = jsData.utils.get;
-  var isArray = jsData.utils.isArray;
-  var isObject = jsData.utils.isObject;
-  var isString = jsData.utils.isString;
-  var isUndefined = jsData.utils.isUndefined;
-  var omit = jsData.utils.omit;
-  var plainCopy = jsData.utils.plainCopy;
-  var resolve = jsData.utils.resolve;
-
-
   var noop = function noop() {
     var self = this;
 
@@ -90,7 +75,7 @@
 
     var opts = args[args.length - 1];
     self.dbg.apply(self, [opts.op].concat(args));
-    return resolve();
+    return jsData.utils.resolve();
   };
 
   var noop2 = function noop2() {
@@ -102,7 +87,7 @@
 
     var opts = args[args.length - 2];
     self.dbg.apply(self, [opts.op].concat(args));
-    return resolve();
+    return jsData.utils.resolve();
   };
 
   var unique = function unique(array) {
@@ -119,7 +104,7 @@
   };
 
   var withoutRelations = function withoutRelations(mapper, props) {
-    return omit(props, mapper.relationFields || []);
+    return jsData.utils.omit(props, mapper.relationFields || []);
   };
 
   var DEFAULTS = {
@@ -155,8 +140,8 @@
   function Adapter(opts) {
     var self = this;
     opts || (opts = {});
-    fillIn(opts, DEFAULTS);
-    fillIn(self, opts);
+    jsData.utils.fillIn(opts, DEFAULTS);
+    jsData.utils.fillIn(self, opts);
   }
 
   Adapter.reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
@@ -173,7 +158,7 @@
     var self = this;
     meta || (meta = {});
     self.data = data;
-    fillIn(self, meta);
+    jsData.utils.fillIn(self, meta);
     self.op = op;
   }
 
@@ -190,9 +175,9 @@
    * properties to the subclass itself.
    * @return {Object} Subclass of `Adapter`.
    */
-  Adapter.extend = extend;
+  Adapter.extend = jsData.utils.extend;
 
-  addHiddenPropsToTarget(Adapter.prototype, {
+  jsData.utils.addHiddenPropsToTarget(Adapter.prototype, {
     /**
      * Lifecycle method method called by <a href="#count__anchor">count</a>.
      *
@@ -700,11 +685,11 @@
 
       // beforeCount lifecycle hook
       op = opts.op = 'beforeCount';
-      return resolve(self[op](mapper, query, opts)).then(function () {
+      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
         // Allow for re-assignment from lifecycle hook
         op = opts.op = 'count';
         self.dbg(op, mapper, query, opts);
-        return resolve(self._count(mapper, query, opts));
+        return jsData.utils.resolve(self._count(mapper, query, opts));
       }).then(function (results) {
         var _results = babelHelpers.slicedToArray(results, 2);
 
@@ -717,9 +702,9 @@
 
         // afterCount lifecycle hook
         op = opts.op = 'afterCount';
-        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -745,13 +730,13 @@
 
       // beforeCreate lifecycle hook
       op = opts.op = 'beforeCreate';
-      return resolve(self[op](mapper, props, opts)).then(function (_props) {
+      return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = isUndefined(_props) ? props : _props;
+        props = jsData.utils.isUndefined(_props) ? props : _props;
         props = withoutRelations(mapper, props);
         op = opts.op = 'create';
         self.dbg(op, mapper, props, opts);
-        return resolve(self._create(mapper, props, opts));
+        return jsData.utils.resolve(self._create(mapper, props, opts));
       }).then(function (results) {
         var _results2 = babelHelpers.slicedToArray(results, 2);
 
@@ -765,9 +750,9 @@
 
         // afterCreate lifecycle hook
         op = opts.op = 'afterCreate';
-        return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -793,15 +778,15 @@
 
       // beforeCreateMany lifecycle hook
       op = opts.op = 'beforeCreateMany';
-      return resolve(self[op](mapper, props, opts)).then(function (_props) {
+      return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = isUndefined(_props) ? props : _props;
+        props = jsData.utils.isUndefined(_props) ? props : _props;
         props = props.map(function (record) {
           return withoutRelations(mapper, record);
         });
         op = opts.op = 'createMany';
         self.dbg(op, mapper, props, opts);
-        return resolve(self._createMany(mapper, props, opts));
+        return jsData.utils.resolve(self._createMany(mapper, props, opts));
       }).then(function (results) {
         var _results3 = babelHelpers.slicedToArray(results, 2);
 
@@ -816,9 +801,9 @@
 
         // afterCreateMany lifecycle hook
         op = opts.op = 'afterCreateMany';
-        return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -844,10 +829,10 @@
 
       // beforeDestroy lifecycle hook
       op = opts.op = 'beforeDestroy';
-      return resolve(self[op](mapper, id, opts)).then(function () {
+      return jsData.utils.resolve(self[op](mapper, id, opts)).then(function () {
         op = opts.op = 'destroy';
         self.dbg(op, mapper, id, opts);
-        return resolve(self._destroy(mapper, id, opts));
+        return jsData.utils.resolve(self._destroy(mapper, id, opts));
       }).then(function (results) {
         var _results4 = babelHelpers.slicedToArray(results, 2);
 
@@ -860,9 +845,9 @@
 
         // afterDestroy lifecycle hook
         op = opts.op = 'afterDestroy';
-        return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -895,10 +880,10 @@
 
       // beforeDestroyAll lifecycle hook
       op = opts.op = 'beforeDestroyAll';
-      return resolve(self[op](mapper, query, opts)).then(function () {
+      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
         op = opts.op = 'destroyAll';
         self.dbg(op, mapper, query, opts);
-        return resolve(self._destroyAll(mapper, query, opts));
+        return jsData.utils.resolve(self._destroyAll(mapper, query, opts));
       }).then(function (results) {
         var _results5 = babelHelpers.slicedToArray(results, 2);
 
@@ -911,9 +896,9 @@
 
         // afterDestroyAll lifecycle hook
         op = opts.op = 'afterDestroyAll';
-        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -947,8 +932,8 @@
      */
     makeHasManyLocalKeys: function makeHasManyLocalKeys(mapper, def, record) {
       var localKeys = [];
-      var itemKeys = get(record, def.localKeys) || [];
-      itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+      var itemKeys = jsData.utils.get(record, def.localKeys) || [];
+      itemKeys = jsData.utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
       localKeys = localKeys.concat(itemKeys);
       return unique(localKeys).filter(function (x) {
         return x;
@@ -966,7 +951,7 @@
      * @return {*}
      */
     makeHasManyForeignKeys: function makeHasManyForeignKeys(mapper, def, record) {
-      return get(record, mapper.idAttribute);
+      return jsData.utils.get(record, mapper.idAttribute);
     },
 
 
@@ -983,7 +968,7 @@
       var self = this;
       var singular = false;
 
-      if (isObject(records) && !isArray(records)) {
+      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
         singular = true;
         records = [records];
       }
@@ -1010,7 +995,7 @@
             attached = relatedItems;
           } else {
             relatedItems.forEach(function (relatedItem) {
-              if (get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
+              if (jsData.utils.get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
                 attached.push(relatedItem);
               }
             });
@@ -1024,7 +1009,7 @@
       var record = void 0;
       var relatedMapper = def.getRelation();
 
-      if (isObject(records) && !isArray(records)) {
+      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
         record = records;
       }
 
@@ -1052,8 +1037,8 @@
             }, __opts).then(function (relatedItems) {
               records.forEach(function (item) {
                 var attached = [];
-                var itemKeys = get(item, def.localKeys) || [];
-                itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+                var itemKeys = jsData.utils.get(item, def.localKeys) || [];
+                itemKeys = jsData.utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
                 relatedItems.forEach(function (relatedItem) {
                   if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
                     attached.push(relatedItem);
@@ -1075,7 +1060,7 @@
       var idAttribute = mapper.idAttribute;
       var record = void 0;
 
-      if (isObject(records) && !isArray(records)) {
+      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
         record = records;
       }
 
@@ -1098,9 +1083,9 @@
           var foreignKeysField = def.foreignKeys;
           records.forEach(function (record) {
             var _relatedItems = [];
-            var id = get(record, idAttribute);
+            var id = jsData.utils.get(record, idAttribute);
             relatedItems.forEach(function (relatedItem) {
-              var foreignKeys = get(relatedItems, foreignKeysField) || [];
+              var foreignKeys = jsData.utils.get(relatedItems, foreignKeysField) || [];
               if (foreignKeys.indexOf(id) !== -1) {
                 _relatedItems.push(relatedItem);
               }
@@ -1122,13 +1107,13 @@
      * @return {Promise}
      */
     loadHasOne: function loadHasOne(mapper, def, records, __opts) {
-      if (isObject(records) && !isArray(records)) {
+      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
         records = [records];
       }
       return this.loadHasMany(mapper, def, records, __opts).then(function () {
         records.forEach(function (record) {
           var relatedData = def.getLocalField(record);
-          if (isArray(relatedData) && relatedData.length) {
+          if (jsData.utils.isArray(relatedData) && relatedData.length) {
             def.setLocalField(record, relatedData[0]);
           }
         });
@@ -1163,7 +1148,7 @@
       var self = this;
       var relationDef = def.getRelation();
 
-      if (isObject(records) && !isArray(records)) {
+      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
         var _ret2 = function () {
           var record = records;
           return {
@@ -1219,10 +1204,10 @@
 
       // beforeFind lifecycle hook
       op = opts.op = 'beforeFind';
-      return resolve(self[op](mapper, id, opts)).then(function () {
+      return jsData.utils.resolve(self[op](mapper, id, opts)).then(function () {
         op = opts.op = 'find';
         self.dbg(op, mapper, id, opts);
-        return resolve(self._find(mapper, id, opts));
+        return jsData.utils.resolve(self._find(mapper, id, opts));
       }).then(function (results) {
         var _results6 = babelHelpers.slicedToArray(results, 1);
 
@@ -1234,7 +1219,7 @@
         record = _record;
         var tasks = [];
 
-        forEachRelation(mapper, opts, function (def, __opts) {
+        jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
           var task = void 0;
           if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
             if (def.type === 'hasOne') {
@@ -1262,9 +1247,9 @@
 
         // afterFind lifecycle hook
         op = opts.op = 'afterFind';
-        return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -1298,21 +1283,21 @@
       var op = void 0;
       var activeWith = opts._activeWith;
 
-      if (isObject(activeWith)) {
+      if (jsData.utils.isObject(activeWith)) {
         var activeQuery = activeWith.query || {};
         if (activeWith.replace) {
           query = activeQuery;
         } else {
-          deepFillIn(query, activeQuery);
+          jsData.utils.deepFillIn(query, activeQuery);
         }
       }
 
       // beforeFindAll lifecycle hook
       op = opts.op = 'beforeFindAll';
-      return resolve(self[op](mapper, query, opts)).then(function () {
+      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
         op = opts.op = 'findAll';
         self.dbg(op, mapper, query, opts);
-        return resolve(self._findAll(mapper, query, opts));
+        return jsData.utils.resolve(self._findAll(mapper, query, opts));
       }).then(function (results) {
         var _results7 = babelHelpers.slicedToArray(results, 1);
 
@@ -1321,7 +1306,7 @@
         _records || (_records = []);
         records = _records;
         var tasks = [];
-        forEachRelation(mapper, opts, function (def, __opts) {
+        jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
           var task = void 0;
           if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
             if (def.type === 'hasMany') {
@@ -1348,9 +1333,9 @@
 
         // afterFindAll lifecycle hook
         op = opts.op = 'afterFindAll';
-        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -1368,7 +1353,7 @@
      */
     getOpt: function getOpt(opt, opts) {
       opts || (opts = {});
-      return isUndefined(opts[opt]) ? plainCopy(this[opt]) : plainCopy(opts[opt]);
+      return jsData.utils.isUndefined(opts[opt]) ? jsData.utils.plainCopy(this[opt]) : jsData.utils.plainCopy(opts[opt]);
     },
 
 
@@ -1429,7 +1414,7 @@
     sum: function sum(mapper, field, query, opts) {
       var self = this;
       var op = void 0;
-      if (!isString(field)) {
+      if (!jsData.utils.isString(field)) {
         throw new Error('field must be a string!');
       }
       query || (query = {});
@@ -1437,11 +1422,11 @@
 
       // beforeSum lifecycle hook
       op = opts.op = 'beforeSum';
-      return resolve(self[op](mapper, field, query, opts)).then(function () {
+      return jsData.utils.resolve(self[op](mapper, field, query, opts)).then(function () {
         // Allow for re-assignment from lifecycle hook
         op = opts.op = 'sum';
         self.dbg(op, mapper, field, query, opts);
-        return resolve(self._sum(mapper, field, query, opts));
+        return jsData.utils.resolve(self._sum(mapper, field, query, opts));
       }).then(function (results) {
         var _results8 = babelHelpers.slicedToArray(results, 2);
 
@@ -1454,9 +1439,9 @@
 
         // afterSum lifecycle hook
         op = opts.op = 'afterSum';
-        return resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -1497,12 +1482,12 @@
 
       // beforeUpdate lifecycle hook
       op = opts.op = 'beforeUpdate';
-      return resolve(self[op](mapper, id, props, opts)).then(function (_props) {
+      return jsData.utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = isUndefined(_props) ? props : _props;
+        props = jsData.utils.isUndefined(_props) ? props : _props;
         op = opts.op = 'update';
         self.dbg(op, mapper, id, props, opts);
-        return resolve(self._update(mapper, id, props, opts));
+        return jsData.utils.resolve(self._update(mapper, id, props, opts));
       }).then(function (results) {
         var _results9 = babelHelpers.slicedToArray(results, 2);
 
@@ -1516,9 +1501,9 @@
 
         // afterUpdate lifecycle hook
         op = opts.op = 'afterUpdate';
-        return resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -1553,12 +1538,12 @@
 
       // beforeUpdateAll lifecycle hook
       op = opts.op = 'beforeUpdateAll';
-      return resolve(self[op](mapper, props, query, opts)).then(function (_props) {
+      return jsData.utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = isUndefined(_props) ? props : _props;
+        props = jsData.utils.isUndefined(_props) ? props : _props;
         op = opts.op = 'updateAll';
         self.dbg(op, mapper, props, query, opts);
-        return resolve(self._updateAll(mapper, props, query, opts));
+        return jsData.utils.resolve(self._updateAll(mapper, props, query, opts));
       }).then(function (results) {
         var _results10 = babelHelpers.slicedToArray(results, 2);
 
@@ -1573,9 +1558,9 @@
 
         // afterUpdateAll lifecycle hook
         op = opts.op = 'afterUpdateAll';
-        return resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     },
@@ -1601,20 +1586,20 @@
       var idAttribute = mapper.idAttribute;
 
       records = records.filter(function (record) {
-        return get(record, idAttribute);
+        return jsData.utils.get(record, idAttribute);
       });
 
       // beforeUpdateMany lifecycle hook
       op = opts.op = 'beforeUpdateMany';
-      return resolve(self[op](mapper, records, opts)).then(function (_records) {
+      return jsData.utils.resolve(self[op](mapper, records, opts)).then(function (_records) {
         // Allow for re-assignment from lifecycle hook
-        records = isUndefined(_records) ? records : _records;
+        records = jsData.utils.isUndefined(_records) ? records : _records;
         records = records.map(function (record) {
           return withoutRelations(mapper, record);
         });
         op = opts.op = 'updateMany';
         self.dbg(op, mapper, records, opts);
-        return resolve(self._updateMany(mapper, records, opts));
+        return jsData.utils.resolve(self._updateMany(mapper, records, opts));
       }).then(function (results) {
         var _results11 = babelHelpers.slicedToArray(results, 2);
 
@@ -1629,9 +1614,9 @@
 
         // afterUpdateMany lifecycle hook
         op = opts.op = 'afterUpdateMany';
-        return resolve(self[op](mapper, records, opts, response)).then(function (_response) {
+        return jsData.utils.resolve(self[op](mapper, records, opts, response)).then(function (_response) {
           // Allow for re-assignment from lifecycle hook
-          return isUndefined(_response) ? response : _response;
+          return jsData.utils.isUndefined(_response) ? response : _response;
         });
       });
     }

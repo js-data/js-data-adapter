@@ -1,3 +1,7 @@
+##### 0.2.4 - 17 March 2016
+
+Re-worked use of js-data utils
+
 ##### 0.2.3 - 17 March 2016
 
 Added count and sum methods
