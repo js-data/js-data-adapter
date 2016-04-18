@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
   "description": "Base adapter class that all other js-data adapters extend.",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -28,25 +28,26 @@
     "test": "npm run build && npm run cover",
     "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
     "release": "npm test && npm run repo-tools",
-    "ci": "npm run test && cat coverage/lcov.info | coveralls || true"
+    "ci": "npm run test && cat coverage/lcov.info | codecov"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-alpha.19"
+    "js-data": "^3.0.0-beta.1"
   },
   "devDependencies": {
-    "babel-core": "6.7.2",
-    "babel-polyfill": "6.7.2",
+    "babel-core": "6.7.6",
+    "babel-polyfill": "6.7.4",
     "babel-preset-es2015-rollup": "1.1.1",
     "chai": "3.5.0",
-    "coveralls": "2.11.8",
-    "istanbul": "0.4.2",
+    "codecov": "1.0.1",
+    "istanbul": "0.4.3",
     "js-data-adapter-tests": "2.0.0-alpha.16",
-    "js-data-repo-tools": "0.2.0",
+    "js-data-repo-tools": "0.3.0",
     "mocha": "2.4.5",
-    "rollup": "0.25.4",
+    "rollup": "0.25.8",
     "rollup-plugin-babel": "2.4.0",
     "sinon": "1.17.3",
     "source-map-support": "0.4.0",
     "watch": "0.17.1"
-  }
+  },
+  "dependencies": {}
 }

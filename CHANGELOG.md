@@ -1,3 +1,7 @@
+##### 0.3.0 - 17 April 2016
+
+Updated for js-data v3 beta
+
 ##### 0.2.4 - 17 March 2016
 
 Re-worked use of js-data utils
