@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('js-data')) :
-  typeof define === 'function' && define.amd ? define('js-data-adapter', ['js-data'], factory) :
-  (factory(global.JSData));
-}(this, function (jsData) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('js-data')) :
+  typeof define === 'function' && define.amd ? define('js-data-adapter', ['exports', 'js-data'], factory) :
+  (factory((global.Adapter = global.Adapter || {}),global.JSData));
+}(this, function (exports,jsData) { 'use strict';
 
   var babelHelpers = {};
   babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -66,6 +66,9 @@
 
   babelHelpers;
 
+  /**
+   * @name module:js-data-adapter.noop
+   */
   var noop = function noop() {
     var self = this;
 
@@ -78,6 +81,9 @@
     return jsData.utils.resolve();
   };
 
+  /**
+   * @name module:js-data-adapter.noop2
+   */
   var noop2 = function noop2() {
     var self = this;
 
@@ -90,6 +96,9 @@
     return jsData.utils.resolve();
   };
 
+  /**
+   * @name module:js-data-adapter.unique
+   */
   var unique = function unique(array) {
     var seen = {};
     var final = [];
@@ -103,6 +112,9 @@
     return final;
   };
 
+  /**
+   * @name module:js-data-adapter.withoutRelations
+   */
   var withoutRelations = function withoutRelations(mapper, props) {
     return jsData.utils.omit(props, mapper.relationFields || []);
   };
@@ -128,6 +140,12 @@
   };
 
   /**
+   * {@link Adapter} class.
+   *
+   * @name module:js-data-adapter.Adapter
+   * @see Adapter
+   */
+  /**
    * Abstract class meant to be extended by adapters.
    *
    * @class Adapter
@@ -144,25 +162,45 @@
     jsData.utils.fillIn(self, opts);
   }
 
-  Adapter.reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
+  /**
+   * @name module:js-data-adapter.reserved
+   */
+  var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
 
+  /**
+   * {@link Response} class.
+   *
+   * @name module:js-data-adapter.Response
+   * @see Response
+   */
   /**
    * Response object used when `raw` is `true`. May contain other fields in
    * addition to `data`.
    *
-   * @typedef {Object} Response
-   * @property {Object} data Response data.
-   * @property {string} op The operation for which the response was created.
+   * @class Response
    */
   function Response(data, meta, op) {
     var self = this;
     meta || (meta = {});
+
+    /**
+     * Response data.
+     *
+     * @name Response#data
+     * @type {*}
+     */
     self.data = data;
+
     jsData.utils.fillIn(self, meta);
+
+    /**
+     * The operation for which the response was created.
+     *
+     * @name Response#op
+     * @type {string}
+     */
     self.op = op;
   }
-
-  Adapter.Response = Response;
 
   /**
    * Alternative to ES6 class syntax for extending `Adapter`.
@@ -176,10 +214,6 @@
    * @return {Object} Subclass of `Adapter`.
    */
   Adapter.extend = jsData.utils.extend;
-
-  Adapter.noop = noop;
-  Adapter.noop2 = noop2;
-  Adapter.unique = unique;
 
   jsData.utils.addHiddenPropsToTarget(Adapter.prototype, {
     /**
@@ -1627,7 +1661,13 @@
     }
   });
 
-  module.exports = Adapter;
+  exports.noop = noop;
+  exports.noop2 = noop2;
+  exports.unique = unique;
+  exports.withoutRelations = withoutRelations;
+  exports.Adapter = Adapter;
+  exports.reserved = reserved;
+  exports.Response = Response;
 
 }));
 //# sourceMappingURL=js-data-adapter.js.map
