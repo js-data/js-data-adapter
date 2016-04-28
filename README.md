@@ -1,25 +1,12 @@
 <img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="96" height="96" />
 
-# js-data-adapter
+# js-data-adapter [![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![npm downloads][dn_b]][dn_l] [![build][circle_b]][circle_l] [![coverage][cov_b]][cov_l]
 
-[![Slack Status][sl_b]][sl_l]
-[![npm version][npm_b]][npm_l]
-[![npm downloads][dn_b]][dn_l]
+Base adapter class that all other JSData adapters extend.
 
-Base adapter class that all other js-data adapters extend.
+Refer to the various JSData adapter repositories to see how they extend `Adapter`.
 
-Refer to the various js-data adapter repositories to see how they extend
-`Adapter`.
-
-## Table of contents
-
-* [Quick start](#quick-start)
-* [Community](#community)
-* [Support](#support)
-* [Contributing](#contributing)
-* [License](#license)
-
-## Quick Start
+## Usage
 
 ##### Browser-based adapter
 ```
@@ -66,18 +53,14 @@ Object.defineProperty(MyAdapter, '__super__', {
 })
 ```
 
+## Links
 
-## Community
-
-[Explore the Community](http://js-data.io/docs/community).
-
-## Support
-
-[Find out how to Get Support](http://js-data.io/docs/support).
-
-## Contributing
-
-[Read the Contributing Guide](http://js-data.io/docs/contributing).
+* [JSData Quick start](http://www.js-data.io/v3.0/docs/home#quick-start) - Get started in 5 minutes
+* [Guides and Tutorials](http://www.js-data.io/v3.0/docs/home) - Learn how to use JSData
+* [API Reference Docs](http://api.js-data.io) - Explore components, methods, options, etc.
+* [Community & Support](http://js-data.io/docs/community) - Find solutions and chat with the community
+* [General Contributing Guide](http://js-data.io/docs/contributing) - Give back and move the project forward
+  * [Contributing to js-data-adapter](https://github.com/js-data/js-data-adapter/blob/master/.github/CONTRIBUTING.md)
 
 ## License
 
@@ -95,3 +78,7 @@ Copyright (c) 2016 js-data-adapter project authors
 [npm_l]: https://www.npmjs.org/package/js-data-adapter
 [dn_b]: https://img.shields.io/npm/dm/js-data-adapter.svg?style=flat
 [dn_l]: https://www.npmjs.org/package/js-data-adapter
+[circle_b]: https://img.shields.io/circleci/project/js-data/js-data-adapter.svg
+[circle_l]: https://circleci.com/gh/js-data/js-data-adapter
+[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-adapter.svg
+[cov_l]: https://codecov.io/gh/js-data/js-data-adapter

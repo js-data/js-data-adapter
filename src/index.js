@@ -108,6 +108,10 @@ Adapter.Response = Response
  */
 Adapter.extend = utils.extend
 
+Adapter.noop = noop
+Adapter.noop2 = noop2
+Adapter.unique = unique
+
 utils.addHiddenPropsToTarget(Adapter.prototype, {
   /**
    * Lifecycle method method called by <a href="#count__anchor">count</a>.
@@ -286,7 +290,8 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
    * @name Adapter#afterSum
    * @method
    * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
-   * @param {Object} props The `props` argument passed to <a href="#sum__anchor">sum</a>.
+   * @param {string} field The `field` argument passed to <a href="#sum__anchor">sum</a>.
+   * @param {Object} query The `query` argument passed to <a href="#sum__anchor">sum</a>.
    * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
    * @property {string} opts.op `afterSum`
    * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
@@ -806,231 +811,6 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
   },
 
   /**
-   * Return the foreignKey from the given record for the provided relationship.
-   *
-   * There may be reasons why you may want to override this method, like when
-   * the id of the parent doesn't exactly match up to the key on the child.
-   *
-   * Override with care.
-   *
-   * @name Adapter#makeHasManyForeignKey
-   * @method
-   * @return {*}
-   */
-  makeHasManyForeignKey (mapper, def, record) {
-    return def.getForeignKey(record)
-  },
-
-  /**
-   * Return the localKeys from the given record for the provided relationship.
-   *
-   * Override with care.
-   *
-   * @name Adapter#makeHasManyLocalKeys
-   * @method
-   * @return {*}
-   */
-  makeHasManyLocalKeys (mapper, def, record) {
-    let localKeys = []
-    let itemKeys = utils.get(record, def.localKeys) || []
-    itemKeys = utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
-    localKeys = localKeys.concat(itemKeys)
-    return unique(localKeys).filter(function (x) { return x })
-  },
-
-  /**
-   * Return the foreignKeys from the given record for the provided relationship.
-   *
-   * Override with care.
-   *
-   * @name Adapter#makeHasManyForeignKeys
-   * @method
-   * @return {*}
-   */
-  makeHasManyForeignKeys (mapper, def, record) {
-    return utils.get(record, mapper.idAttribute)
-  },
-
-  /**
-   * Load a hasMany relationship.
-   *
-   * Override with care.
-   *
-   * @name Adapter#loadHasMany
-   * @method
-   * @return {Promise}
-   */
-  loadHasMany (mapper, def, records, __opts) {
-    const self = this
-    let singular = false
-
-    if (utils.isObject(records) && !utils.isArray(records)) {
-      singular = true
-      records = [records]
-    }
-    const IDs = records.map(function (record) {
-      return self.makeHasManyForeignKey(mapper, def, record)
-    })
-    const query = {
-      where: {}
-    }
-    const criteria = query.where[def.foreignKey] = {}
-    if (singular) {
-      // more efficient query when we only have one record
-      criteria['=='] = IDs[0]
-    } else {
-      criteria['in'] = IDs.filter(function (id) {
-        return id
-      })
-    }
-    return self.findAll(def.getRelation(), query, __opts).then(function (relatedItems) {
-      records.forEach(function (record) {
-        let attached = []
-        // avoid unneccesary iteration when we only have one record
-        if (singular) {
-          attached = relatedItems
-        } else {
-          relatedItems.forEach(function (relatedItem) {
-            if (utils.get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
-              attached.push(relatedItem)
-            }
-          })
-        }
-        def.setLocalField(record, attached)
-      })
-    })
-  },
-
-  loadHasManyLocalKeys (mapper, def, records, __opts) {
-    const self = this
-    let record
-    const relatedMapper = def.getRelation()
-
-    if (utils.isObject(records) && !utils.isArray(records)) {
-      record = records
-    }
-
-    if (record) {
-      return self.findAll(relatedMapper, {
-        where: {
-          [relatedMapper.idAttribute]: {
-            'in': self.makeHasManyLocalKeys(mapper, def, record)
-          }
-        }
-      }, __opts).then(function (relatedItems) {
-        def.setLocalField(record, relatedItems)
-      })
-    } else {
-      let localKeys = []
-      records.forEach(function (record) {
-        localKeys = localKeys.concat(self.self.makeHasManyLocalKeys(mapper, def, record))
-      })
-      return self.findAll(relatedMapper, {
-        where: {
-          [relatedMapper.idAttribute]: {
-            'in': unique(localKeys).filter(function (x) { return x })
-          }
-        }
-      }, __opts).then(function (relatedItems) {
-        records.forEach(function (item) {
-          let attached = []
-          let itemKeys = utils.get(item, def.localKeys) || []
-          itemKeys = utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
-          relatedItems.forEach(function (relatedItem) {
-            if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
-              attached.push(relatedItem)
-            }
-          })
-          def.setLocalField(item, attached)
-        })
-        return relatedItems
-      })
-    }
-  },
-
-  loadHasManyForeignKeys (mapper, def, records, __opts) {
-    const self = this
-    const relatedMapper = def.getRelation()
-    const idAttribute = mapper.idAttribute
-    let record
-
-    if (utils.isObject(records) && !utils.isArray(records)) {
-      record = records
-    }
-
-    if (record) {
-      return self.findAll(def.getRelation(), {
-        where: {
-          [def.foreignKeys]: {
-            'contains': self.makeHasManyForeignKeys(mapper, def, record)
-          }
-        }
-      }, __opts).then(function (relatedItems) {
-        def.setLocalField(record, relatedItems)
-      })
-    } else {
-      return self.findAll(relatedMapper, {
-        where: {
-          [def.foreignKeys]: {
-            'isectNotEmpty': records.map(function (record) {
-              return self.makeHasManyForeignKeys(mapper, def, record)
-            })
-          }
-        }
-      }, __opts).then(function (relatedItems) {
-        const foreignKeysField = def.foreignKeys
-        records.forEach(function (record) {
-          const _relatedItems = []
-          const id = utils.get(record, idAttribute)
-          relatedItems.forEach(function (relatedItem) {
-            const foreignKeys = utils.get(relatedItems, foreignKeysField) || []
-            if (foreignKeys.indexOf(id) !== -1) {
-              _relatedItems.push(relatedItem)
-            }
-          })
-          def.setLocalField(record, _relatedItems)
-        })
-      })
-    }
-  },
-
-  /**
-   * Load a hasOne relationship.
-   *
-   * Override with care.
-   *
-   * @name Adapter#loadHasOne
-   * @method
-   * @return {Promise}
-   */
-  loadHasOne (mapper, def, records, __opts) {
-    if (utils.isObject(records) && !utils.isArray(records)) {
-      records = [records]
-    }
-    return this.loadHasMany(mapper, def, records, __opts).then(function () {
-      records.forEach(function (record) {
-        const relatedData = def.getLocalField(record)
-        if (utils.isArray(relatedData) && relatedData.length) {
-          def.setLocalField(record, relatedData[0])
-        }
-      })
-    })
-  },
-
-  /**
-   * Return the foreignKey from the given record for the provided relationship.
-   *
-   * Override with care.
-   *
-   * @name Adapter#makeBelongsToForeignKey
-   * @method
-   * @return {*}
-   */
-  makeBelongsToForeignKey (mapper, def, record) {
-    return def.getForeignKey(record)
-  },
-
-  /**
    * Load a belongsTo relationship.
    *
    * Override with care.
@@ -1238,6 +1018,172 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
   },
 
   /**
+   * Load a hasMany relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#loadHasMany
+   * @method
+   * @return {Promise}
+   */
+  loadHasMany (mapper, def, records, __opts) {
+    const self = this
+    let singular = false
+
+    if (utils.isObject(records) && !utils.isArray(records)) {
+      singular = true
+      records = [records]
+    }
+    const IDs = records.map(function (record) {
+      return self.makeHasManyForeignKey(mapper, def, record)
+    })
+    const query = {
+      where: {}
+    }
+    const criteria = query.where[def.foreignKey] = {}
+    if (singular) {
+      // more efficient query when we only have one record
+      criteria['=='] = IDs[0]
+    } else {
+      criteria['in'] = IDs.filter(function (id) {
+        return id
+      })
+    }
+    return self.findAll(def.getRelation(), query, __opts).then(function (relatedItems) {
+      records.forEach(function (record) {
+        let attached = []
+        // avoid unneccesary iteration when we only have one record
+        if (singular) {
+          attached = relatedItems
+        } else {
+          relatedItems.forEach(function (relatedItem) {
+            if (utils.get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
+              attached.push(relatedItem)
+            }
+          })
+        }
+        def.setLocalField(record, attached)
+      })
+    })
+  },
+
+  loadHasManyLocalKeys (mapper, def, records, __opts) {
+    const self = this
+    let record
+    const relatedMapper = def.getRelation()
+
+    if (utils.isObject(records) && !utils.isArray(records)) {
+      record = records
+    }
+
+    if (record) {
+      return self.findAll(relatedMapper, {
+        where: {
+          [relatedMapper.idAttribute]: {
+            'in': self.makeHasManyLocalKeys(mapper, def, record)
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        def.setLocalField(record, relatedItems)
+      })
+    } else {
+      let localKeys = []
+      records.forEach(function (record) {
+        localKeys = localKeys.concat(self.self.makeHasManyLocalKeys(mapper, def, record))
+      })
+      return self.findAll(relatedMapper, {
+        where: {
+          [relatedMapper.idAttribute]: {
+            'in': unique(localKeys).filter(function (x) { return x })
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        records.forEach(function (item) {
+          let attached = []
+          let itemKeys = utils.get(item, def.localKeys) || []
+          itemKeys = utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+          relatedItems.forEach(function (relatedItem) {
+            if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
+              attached.push(relatedItem)
+            }
+          })
+          def.setLocalField(item, attached)
+        })
+        return relatedItems
+      })
+    }
+  },
+
+  loadHasManyForeignKeys (mapper, def, records, __opts) {
+    const self = this
+    const relatedMapper = def.getRelation()
+    const idAttribute = mapper.idAttribute
+    let record
+
+    if (utils.isObject(records) && !utils.isArray(records)) {
+      record = records
+    }
+
+    if (record) {
+      return self.findAll(def.getRelation(), {
+        where: {
+          [def.foreignKeys]: {
+            'contains': self.makeHasManyForeignKeys(mapper, def, record)
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        def.setLocalField(record, relatedItems)
+      })
+    } else {
+      return self.findAll(relatedMapper, {
+        where: {
+          [def.foreignKeys]: {
+            'isectNotEmpty': records.map(function (record) {
+              return self.makeHasManyForeignKeys(mapper, def, record)
+            })
+          }
+        }
+      }, __opts).then(function (relatedItems) {
+        const foreignKeysField = def.foreignKeys
+        records.forEach(function (record) {
+          const _relatedItems = []
+          const id = utils.get(record, idAttribute)
+          relatedItems.forEach(function (relatedItem) {
+            const foreignKeys = utils.get(relatedItems, foreignKeysField) || []
+            if (foreignKeys.indexOf(id) !== -1) {
+              _relatedItems.push(relatedItem)
+            }
+          })
+          def.setLocalField(record, _relatedItems)
+        })
+      })
+    }
+  },
+
+  /**
+   * Load a hasOne relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#loadHasOne
+   * @method
+   * @return {Promise}
+   */
+  loadHasOne (mapper, def, records, __opts) {
+    if (utils.isObject(records) && !utils.isArray(records)) {
+      records = [records]
+    }
+    return this.loadHasMany(mapper, def, records, __opts).then(function () {
+      records.forEach(function (record) {
+        const relatedData = def.getLocalField(record)
+        if (utils.isArray(relatedData) && relatedData.length) {
+          def.setLocalField(record, relatedData[0])
+        }
+      })
+    })
+  },
+
+  /**
    * Logging utility method. Override this method if you want to send log
    * messages to something other than the console.
    *
@@ -1260,6 +1206,65 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
     } else {
       console.log(prefix, ...args)
     }
+  },
+
+  /**
+   * Return the foreignKey from the given record for the provided relationship.
+   *
+   * There may be reasons why you may want to override this method, like when
+   * the id of the parent doesn't exactly match up to the key on the child.
+   *
+   * Override with care.
+   *
+   * @name Adapter#makeHasManyForeignKey
+   * @method
+   * @return {*}
+   */
+  makeHasManyForeignKey (mapper, def, record) {
+    return def.getForeignKey(record)
+  },
+
+  /**
+   * Return the localKeys from the given record for the provided relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#makeHasManyLocalKeys
+   * @method
+   * @return {*}
+   */
+  makeHasManyLocalKeys (mapper, def, record) {
+    let localKeys = []
+    let itemKeys = utils.get(record, def.localKeys) || []
+    itemKeys = utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+    localKeys = localKeys.concat(itemKeys)
+    return unique(localKeys).filter(function (x) { return x })
+  },
+
+  /**
+   * Return the foreignKeys from the given record for the provided relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#makeHasManyForeignKeys
+   * @method
+   * @return {*}
+   */
+  makeHasManyForeignKeys (mapper, def, record) {
+    return utils.get(record, mapper.idAttribute)
+  },
+
+  /**
+   * Return the foreignKey from the given record for the provided relationship.
+   *
+   * Override with care.
+   *
+   * @name Adapter#makeBelongsToForeignKey
+   * @method
+   * @return {*}
+   */
+  makeBelongsToForeignKey (mapper, def, record) {
+    return def.getForeignKey(record)
   },
 
   /**

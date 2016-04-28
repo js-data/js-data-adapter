@@ -1,3 +1,8 @@
+##### 0.4.0 - 27 April 2016
+
+- Added Typescript definitions
+- Moved dist files to another branch
+
 ##### 0.3.0 - 17 April 2016
 
 Updated for js-data v3 beta
