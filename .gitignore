@@ -1,5 +1,3 @@
 node_modules
 coverage
 doc
-dist/*.js
-dist/*.map
