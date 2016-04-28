@@ -1,6 +1,8 @@
 <img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="96" height="96" />
 
-# js-data-adapter [![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![npm downloads][dn_b]][dn_l] [![build][circle_b]][circle_l] [![coverage][cov_b]][cov_l]
+# js-data-adapter
+
+[![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![npm downloads][dn_b]][dn_l] [![build][circle_b]][circle_l] [![coverage][cov_b]][cov_l]
 
 Base adapter class that all other JSData adapters extend.
 
