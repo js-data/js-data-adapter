@@ -24,16 +24,20 @@ npm i --save js-data js-data-adapter
 Now extend the adapter:
 
 ```js
+import {Adapter} from 'js-data-adapter'
 // ES6
 class MyAdapter extends Adapter {}
 ```
 
 ```js
+var Adapter = require('js-data-adapter').Adapter
 // Use Adapter.extend
 var MyAdapter = Adapter.extend()
 ```
 
 ```js
+var Adapter = require('js-data-adapter').Adapter
+
 // Manually extend
 function MyAdapter (opts) {
   Adapter.call(this, opts)

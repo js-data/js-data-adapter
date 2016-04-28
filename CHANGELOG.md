@@ -1,3 +1,12 @@
+##### 0.5.0 - 27 April 2016
+
+###### Breaking changes
+- `dist/js-data-adapter.d.ts` is now is ES6 module format
+
+###### Backwards compatible changes
+- Added `typings` field to `package.json`
+- Added `typings.json`
+
 ##### 0.4.0 - 27 April 2016
 
 - Added Typescript definitions
