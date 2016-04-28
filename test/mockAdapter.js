@@ -1,4 +1,4 @@
-var Adapter = require('../')
+var Adapter = require('../').Adapter
 var JSData = require('js-data')
 var Collection = JSData.Collection
 var utils = JSData.utils

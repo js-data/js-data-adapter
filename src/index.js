@@ -1,20 +1,35 @@
+/**
+ * Registered as `js-data-adapter` in NPM.
+ *
+ * @module js-data-adapter
+ */
+
 import {utils} from 'js-data'
 
-const noop = function (...args) {
+/**
+ * @name module:js-data-adapter.noop
+ */
+export const noop = function (...args) {
   const self = this
   const opts = args[args.length - 1]
   self.dbg(opts.op, ...args)
   return utils.resolve()
 }
 
-const noop2 = function (...args) {
+/**
+ * @name module:js-data-adapter.noop2
+ */
+export const noop2 = function (...args) {
   const self = this
   const opts = args[args.length - 2]
   self.dbg(opts.op, ...args)
   return utils.resolve()
 }
 
-const unique = function (array) {
+/**
+ * @name module:js-data-adapter.unique
+ */
+export const unique = function (array) {
   const seen = {}
   const final = []
   array.forEach(function (item) {
@@ -27,7 +42,10 @@ const unique = function (array) {
   return final
 }
 
-const withoutRelations = function (mapper, props) {
+/**
+ * @name module:js-data-adapter.withoutRelations
+ */
+export const withoutRelations = function (mapper, props) {
   return utils.omit(props, mapper.relationFields || [])
 }
 
@@ -52,6 +70,12 @@ const DEFAULTS = {
 }
 
 /**
+ * {@link Adapter} class.
+ *
+ * @name module:js-data-adapter.Adapter
+ * @see Adapter
+ */
+/**
  * Abstract class meant to be extended by adapters.
  *
  * @class Adapter
@@ -61,14 +85,17 @@ const DEFAULTS = {
  * @param {boolean} [opts.raw=false] Whether to return a more detailed response
  * object.
  */
-function Adapter (opts) {
+export function Adapter (opts) {
   const self = this
   opts || (opts = {})
   utils.fillIn(opts, DEFAULTS)
   utils.fillIn(self, opts)
 }
 
-Adapter.reserved = [
+/**
+ * @name module:js-data-adapter.reserved
+ */
+export const reserved = [
   'orderBy',
   'sort',
   'limit',
@@ -78,22 +105,39 @@ Adapter.reserved = [
 ]
 
 /**
+ * {@link Response} class.
+ *
+ * @name module:js-data-adapter.Response
+ * @see Response
+ */
+/**
  * Response object used when `raw` is `true`. May contain other fields in
  * addition to `data`.
  *
- * @typedef {Object} Response
- * @property {Object} data Response data.
- * @property {string} op The operation for which the response was created.
+ * @class Response
  */
-function Response (data, meta, op) {
+export function Response (data, meta, op) {
   const self = this
   meta || (meta = {})
+
+  /**
+   * Response data.
+   *
+   * @name Response#data
+   * @type {*}
+   */
   self.data = data
+
   utils.fillIn(self, meta)
+
+  /**
+   * The operation for which the response was created.
+   *
+   * @name Response#op
+   * @type {string}
+   */
   self.op = op
 }
-
-Adapter.Response = Response
 
 /**
  * Alternative to ES6 class syntax for extending `Adapter`.
@@ -107,10 +151,6 @@ Adapter.Response = Response
  * @return {Object} Subclass of `Adapter`.
  */
 Adapter.extend = utils.extend
-
-Adapter.noop = noop
-Adapter.noop2 = noop2
-Adapter.unique = unique
 
 utils.addHiddenPropsToTarget(Adapter.prototype, {
   /**
@@ -1477,5 +1517,3 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
     })
   }
 })
-
-module.exports = Adapter
