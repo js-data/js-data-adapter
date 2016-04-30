@@ -3,7 +3,6 @@
   "version": false,
   "main": "./dist/js-data-adapter.d.ts",
   "ambientDependencies": {
-    "js-data": "npm:js-data",
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654"
+    "es6-shim": "registry:dt/es6-shim"
   }
 }

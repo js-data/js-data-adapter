@@ -1,14 +1,6 @@
-/**
- * Registered as `js-data-adapter` in NPM.
- *
- * @module js-data-adapter
- */
 
 import {utils} from 'js-data'
 
-/**
- * @name module:js-data-adapter.noop
- */
 export const noop = function (...args) {
   const self = this
   const opts = args[args.length - 1]
@@ -16,9 +8,6 @@ export const noop = function (...args) {
   return utils.resolve()
 }
 
-/**
- * @name module:js-data-adapter.noop2
- */
 export const noop2 = function (...args) {
   const self = this
   const opts = args[args.length - 2]
@@ -26,9 +15,6 @@ export const noop2 = function (...args) {
   return utils.resolve()
 }
 
-/**
- * @name module:js-data-adapter.unique
- */
 export const unique = function (array) {
   const seen = {}
   const final = []
@@ -42,9 +28,6 @@ export const unique = function (array) {
   return final
 }
 
-/**
- * @name module:js-data-adapter.withoutRelations
- */
 export const withoutRelations = function (mapper, props) {
   return utils.omit(props, mapper.relationFields || [])
 }
@@ -70,12 +53,6 @@ const DEFAULTS = {
 }
 
 /**
- * {@link Adapter} class.
- *
- * @name module:js-data-adapter.Adapter
- * @see Adapter
- */
-/**
  * Abstract class meant to be extended by adapters.
  *
  * @class Adapter
@@ -92,9 +69,6 @@ export function Adapter (opts) {
   utils.fillIn(self, opts)
 }
 
-/**
- * @name module:js-data-adapter.reserved
- */
 export const reserved = [
   'orderBy',
   'sort',
@@ -104,12 +78,6 @@ export const reserved = [
   'where'
 ]
 
-/**
- * {@link Response} class.
- *
- * @name module:js-data-adapter.Response
- * @see Response
- */
 /**
  * Response object used when `raw` is `true`. May contain other fields in
  * addition to `data`.

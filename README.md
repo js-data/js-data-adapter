@@ -2,7 +2,11 @@
 
 # js-data-adapter
 
-[![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![npm downloads][dn_b]][dn_l] [![build][circle_b]][circle_l] [![coverage][cov_b]][cov_l]
+[![Slack Status][sl_b]][sl_l]
+[![npm version][npm_b]][npm_l]
+[![npm downloads][dn_b]][dn_l]
+[![build][circle_b]][circle_l]
+[![coverage][cov_b]][cov_l]
 
 Base adapter class that all other JSData adapters extend.
 
@@ -84,7 +88,7 @@ Copyright (c) 2016 js-data-adapter project authors
 [npm_l]: https://www.npmjs.org/package/js-data-adapter
 [dn_b]: https://img.shields.io/npm/dm/js-data-adapter.svg?style=flat
 [dn_l]: https://www.npmjs.org/package/js-data-adapter
-[circle_b]: https://img.shields.io/circleci/project/js-data/js-data-adapter.svg
+[circle_b]: https://img.shields.io/circleci/project/js-data/js-data-adapter.svg?style=flat
 [circle_l]: https://circleci.com/gh/js-data/js-data-adapter
-[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-adapter.svg
+[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-adapter.svg?style=flat
 [cov_l]: https://codecov.io/gh/js-data/js-data-adapter
