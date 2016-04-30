@@ -1497,6 +1497,7 @@
       return jsData.utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
         props = jsData.utils.isUndefined(_props) ? props : _props;
+        props = withoutRelations(mapper, props);
         op = opts.op = 'update';
         self.dbg(op, mapper, id, props, opts);
         return jsData.utils.resolve(self._update(mapper, id, props, opts));
@@ -1553,6 +1554,7 @@
       return jsData.utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
         props = jsData.utils.isUndefined(_props) ? props : _props;
+        props = withoutRelations(mapper, props);
         op = opts.op = 'updateAll';
         self.dbg(op, mapper, props, query, opts);
         return jsData.utils.resolve(self._updateAll(mapper, props, query, opts));
