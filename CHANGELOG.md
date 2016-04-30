@@ -1,3 +1,8 @@
+##### 0.6.0 - 29 April 2016
+
+- Fixed some comments
+- Updated some dependencies
+
 ##### 0.5.0 - 27 April 2016
 
 ###### Breaking changes
