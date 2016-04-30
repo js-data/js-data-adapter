@@ -66,9 +66,6 @@
 
   babelHelpers;
 
-  /**
-   * @name module:js-data-adapter.noop
-   */
   var noop = function noop() {
     var self = this;
 
@@ -81,9 +78,6 @@
     return jsData.utils.resolve();
   };
 
-  /**
-   * @name module:js-data-adapter.noop2
-   */
   var noop2 = function noop2() {
     var self = this;
 
@@ -96,9 +90,6 @@
     return jsData.utils.resolve();
   };
 
-  /**
-   * @name module:js-data-adapter.unique
-   */
   var unique = function unique(array) {
     var seen = {};
     var final = [];
@@ -112,9 +103,6 @@
     return final;
   };
 
-  /**
-   * @name module:js-data-adapter.withoutRelations
-   */
   var withoutRelations = function withoutRelations(mapper, props) {
     return jsData.utils.omit(props, mapper.relationFields || []);
   };
@@ -140,12 +128,6 @@
   };
 
   /**
-   * {@link Adapter} class.
-   *
-   * @name module:js-data-adapter.Adapter
-   * @see Adapter
-   */
-  /**
    * Abstract class meant to be extended by adapters.
    *
    * @class Adapter
@@ -162,17 +144,8 @@
     jsData.utils.fillIn(self, opts);
   }
 
-  /**
-   * @name module:js-data-adapter.reserved
-   */
   var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
 
-  /**
-   * {@link Response} class.
-   *
-   * @name module:js-data-adapter.Response
-   * @see Response
-   */
   /**
    * Response object used when `raw` is `true`. May contain other fields in
    * addition to `data`.
