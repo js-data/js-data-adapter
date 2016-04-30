@@ -12,14 +12,6 @@ export class Response implements IDict {
   op: string
 }
 export class Adapter {
-  static version: {
-    full?: string
-    minor?: string
-    major?: string
-    patch?: string
-    alpha?: string | boolean
-    beta?: string | boolean
-  }
   static extend(instanceProps?: IDict, classProps?: IDict): typeof Adapter
   debug: boolean
   raw: boolean

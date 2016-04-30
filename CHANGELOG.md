@@ -1,3 +1,7 @@
+##### 0.6.1 - 30 April 2016
+
+- Fixed missing uses of `withoutRelations(...)`
+
 ##### 0.6.0 - 29 April 2016
 
 - Fixed some comments
