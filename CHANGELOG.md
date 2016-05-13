@@ -1,3 +1,8 @@
+##### 0.6.2 - 13 May 2016
+
+###### Bug fixes
+- Fixed typo in js-data-adapter.d.ts
+
 ##### 0.6.1 - 30 April 2016
 
 - Fixed missing uses of `withoutRelations(...)`
