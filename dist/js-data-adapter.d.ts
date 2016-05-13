@@ -62,6 +62,6 @@ export class Adapter {
   updateAll(mapper: Mapper, props: IDict, query: IDict, opts: IDict): any
   updateMany(mapper: Mapper, props: IDict[], opts: IDict): any
 }
-export function noop(...any): Promise<any>
-export function noop2(...any): Promise<any>
+export function noop(...args: any[]): Promise<any>
+export function noop2(...args: any[]): Promise<any>
 export function unique(array: any[]): any[]
