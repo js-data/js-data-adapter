@@ -449,6 +449,7 @@ export default function (options) {
 
     if (options.hasFeature('findAllGroupedWhere')) {
       it('should support filtering grouped "where" clauses', async function () {
+        this.toClear.push('Post')
         const posts = await adapter.createMany(Post, [
           { status: 'draft', content: 'foo' },
           { status: 'broken', content: 'bar' },
@@ -484,10 +485,11 @@ export default function (options) {
                 '=': 'flagged'
               }
             }
-          ]
+          ],
+          orderBy: 'status'
         }
 
-        assert.objectsEqual(await adapter.findAll(Post, query), [posts[0], posts[2], posts[4]])
+        assert.objectsEqual(await adapter.findAll(Post, query), [posts[0], posts[4], posts[2]])
       })
     }
   })
