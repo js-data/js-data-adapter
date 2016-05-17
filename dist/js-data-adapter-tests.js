@@ -3753,10 +3753,11 @@
             while (1) {
               switch (_context13.prev = _context13.next) {
                 case 0:
-                  _context13.next = 2;
+                  this.toClear.push('Post');
+                  _context13.next = 3;
                   return adapter.createMany(Post, [{ status: 'draft', content: 'foo' }, { status: 'broken', content: 'bar' }, { status: 'published', content: 'hi' }, { status: 'flagged', content: 'hello world' }, { status: 'flagged', content: 'test' }]);
 
-                case 2:
+                case 3:
                   posts = _context13.sent;
                   query = {
                     where: [[{
@@ -3777,19 +3778,20 @@
                       status: {
                         '=': 'flagged'
                       }
-                    }]
+                    }],
+                    orderBy: 'status'
                   };
                   _context13.t0 = assert;
-                  _context13.next = 7;
+                  _context13.next = 8;
                   return adapter.findAll(Post, query);
 
-                case 7:
+                case 8:
                   _context13.t1 = _context13.sent;
-                  _context13.t2 = [posts[0], posts[2], posts[4]];
+                  _context13.t2 = [posts[0], posts[4], posts[2]];
 
                   _context13.t0.objectsEqual.call(_context13.t0, _context13.t1, _context13.t2);
 
-                case 10:
+                case 11:
                 case 'end':
                   return _context13.stop();
               }
