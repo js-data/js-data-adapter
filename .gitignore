@@ -1,3 +1,4 @@
+.nyc_output
 typings
 node_modules
 coverage

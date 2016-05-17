@@ -1,3 +1,11 @@
+##### 0.7.0 - 16 May 2016
+
+###### Breaking changes
+- Added tests for grouped "where" clauses. Flag: `findAllGroupedWhere`
+
+###### Other
+- Moved general adapter tests into this project
+
 ##### 0.6.2 - 13 May 2016
 
 ###### Bug fixes

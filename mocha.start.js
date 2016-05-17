@@ -2,14 +2,16 @@
 'use strict'
 
 // prepare environment for js-data-adapter-tests
-require('babel-polyfill')
+import 'babel-polyfill'
 
-var JSData = require('js-data')
-var JSDataAdapterTests = require('js-data-adapter-tests')
-var MockAdapter = require('./test/mockAdapter')
+import * as JSData from 'js-data'
+import JSDataAdapterTests from './test/index'
+import MockAdapter from './test/mockAdapter'
 
 global.assert = JSDataAdapterTests.assert
 global.sinon = JSDataAdapterTests.sinon
+
+console.log(`Testing with JSData v${JSData.version.full}`)
 
 JSDataAdapterTests.init({
   debug: false,

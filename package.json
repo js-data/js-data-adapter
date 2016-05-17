@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
   "description": "Base adapter class that all other js-data adapters extend.",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -24,34 +24,59 @@
     "adapter"
   ],
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "globals": [
+      "Mocha",
+      "describe",
+      "sinon",
+      "it",
+      "before",
+      "after",
+      "beforeEach",
+      "afterEach",
+      "assert"
+    ],
+    "ignore": [
+      "dist/"
+    ]
   },
   "babel": {
     "presets": [
-      "es2015-rollup"
+      "es2015",
+      "stage-0"
+    ],
+    "plugins": [
+      "syntax-async-functions",
+      "transform-regenerator"
     ]
   },
   "scripts": {
-    "lint": "repo-tools lint src/index.js rollup.config.js",
-    "bundle": "rollup -c rollup.config.js -f umd -o dist/js-data-adapter.js -m dist/js-data-adapter.js.map src/index.js",
+    "lint": "repo-tools lint \"**/*.js\"",
+    "bundle_adapter": "rollup -c rollup.config.js -f umd -o dist/js-data-adapter.js -m dist/js-data-adapter.js.map src/index.js",
+    "bundle_tests": "rollup -c rollup-tests.config.js -f umd -o dist/js-data-adapter-tests.js -m dist/js-data-adapter-tests.js.map test/index.js",
+    "bundle": "npm run bundle_adapter && npm run bundle_tests",
     "watch": "watch \"npm run bundle\" src/",
     "build": "npm run lint && npm run bundle",
-    "mocha": "mocha -t 30000 -R dot -r source-map-support/register mocha.start.js",
-    "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 30000 -R dot -r source-map-support/register mocha.start.js",
+    "mocha": "mocha -t 30000 -R dot mocha.start.js -r babel-core/register -r babel-polyfill",
+    "cover": "nyc --require babel-core/register --require babel-polyfill --cache mocha mocha.start.js -t 20000 -R dot && nyc report --reporter=html",
     "test": "npm run build && npm run cover",
-    "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
-    "release": "npm test && npm run repo-tools",
-    "ci": "npm run test && cat coverage/lcov.info | codecov"
+    "release": "npm test && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.2"
+    "chai": "3.x",
+    "js-data": "^3.0.0-beta.6",
+    "mocha": "2.x",
+    "sinon": "1.x"
   },
   "devDependencies": {
+    "babel-plugin-syntax-async-functions": "6.8.0",
+    "babel-plugin-transform-regenerator": "6.8.0",
     "babel-polyfill": "6.8.0",
+    "babel-preset-es2015": "^6.6.0",
     "babel-preset-es2015-rollup": "1.1.1",
-    "istanbul": "0.4.3",
-    "js-data-adapter-tests": "2.0.0-alpha.16",
+    "babel-preset-stage-0": "6.5.0",
     "js-data-repo-tools": "0.5.1",
+    "nyc": "6.4.4",
     "rollup": "0.26.3",
     "rollup-plugin-babel": "2.4.0",
     "source-map-support": "0.4.0",

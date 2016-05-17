@@ -1,0 +1,17 @@
+general:
+  branches:
+    ignore:
+      - gh-pages
+machine:
+  node:
+    version: 5.7.0
+dependencies:
+  pre:
+    - npm i -g npm
+    - npm i -g codecov nyc
+test:
+  post:
+    - nyc report --reporter=lcov | codecov
+general:
+  artifacts:
+    - "dist"
