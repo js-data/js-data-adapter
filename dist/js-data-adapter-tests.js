@@ -3748,51 +3748,48 @@
 
       if (options.hasFeature('findAllGroupedWhere')) {
         it('should support filtering grouped "where" clauses', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
-          var PostCollection, post1, post3, post5, query;
+          var posts, query;
           return regeneratorRuntime.wrap(function _callee13$(_context13) {
             while (1) {
               switch (_context13.prev = _context13.next) {
                 case 0:
-                  PostCollection = adapter.getCollection(Post);
-                  post1 = PostCollection.add({ author: 'John', age: 30, id: 5, roles: ['admin'] });
+                  _context13.next = 2;
+                  return adapter.createMany(Post, [{ status: 'draft', content: 'foo' }, { status: 'broken', content: 'bar' }, { status: 'published', content: 'hi' }, { status: 'flagged', content: 'hello world' }, { status: 'flagged', content: 'test' }]);
 
-                  PostCollection.add({ author: 'Sally', age: 31, id: 6, roles: ['admin', 'dev'] });
-                  post3 = PostCollection.add({ author: 'Mike', age: 32, id: 7, roles: ['admin', 'dev'] });
-
-                  PostCollection.add({ author: 'Adam', age: 33, id: 8, roles: [] });
-                  post5 = PostCollection.add({ author: 'Adam', age: 33, id: 9, roles: ['admin', 'dev', 'owner'] });
+                case 2:
+                  posts = _context13.sent;
                   query = {
                     where: [[{
-                      roles: {
-                        'contains': 'admin'
+                      content: {
+                        '=': 'foo'
                       },
-                      age: {
-                        '=': 30
+                      status: {
+                        '=': 'draft'
                       }
                     }, 'or', {
-                      author: {
-                        '=': 'Mike'
+                      status: {
+                        '=': 'published'
                       }
                     }], 'or', {
-                      roles: {
-                        'contains': 'owner'
+                      content: {
+                        '=': 'test'
                       },
-                      age: {
-                        '=': 33
+                      status: {
+                        '=': 'flagged'
                       }
                     }]
                   };
                   _context13.t0 = assert;
-                  _context13.next = 10;
+                  _context13.next = 7;
                   return adapter.findAll(Post, query);
 
-                case 10:
+                case 7:
                   _context13.t1 = _context13.sent;
-                  _context13.t2 = [post1, post3, post5];
+                  _context13.t2 = [posts[0], posts[2], posts[4]];
 
                   _context13.t0.objectsEqual.call(_context13.t0, _context13.t1, _context13.t2);
 
-                case 13:
+                case 10:
                 case 'end':
                   return _context13.stop();
               }
