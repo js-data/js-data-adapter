@@ -449,44 +449,45 @@ export default function (options) {
 
     if (options.hasFeature('findAllGroupedWhere')) {
       it('should support filtering grouped "where" clauses', async function () {
-        const PostCollection = adapter.getCollection(Post)
-        const post1 = PostCollection.add({ author: 'John', age: 30, id: 5, roles: ['admin'] })
-        PostCollection.add({ author: 'Sally', age: 31, id: 6, roles: ['admin', 'dev'] })
-        const post3 = PostCollection.add({ author: 'Mike', age: 32, id: 7, roles: ['admin', 'dev'] })
-        PostCollection.add({ author: 'Adam', age: 33, id: 8, roles: [] })
-        const post5 = PostCollection.add({ author: 'Adam', age: 33, id: 9, roles: ['admin', 'dev', 'owner'] })
+        const posts = await adapter.createMany(Post, [
+          { status: 'draft', content: 'foo' },
+          { status: 'broken', content: 'bar' },
+          { status: 'published', content: 'hi' },
+          { status: 'flagged', content: 'hello world' },
+          { status: 'flagged', content: 'test' }
+        ])
 
         let query = {
           where: [
             [
               {
-                roles: {
-                  'contains': 'admin'
+                content: {
+                  '=': 'foo'
                 },
-                age: {
-                  '=': 30
+                status: {
+                  '=': 'draft'
                 }
               },
               'or',
               {
-                author: {
-                  '=': 'Mike'
+                status: {
+                  '=': 'published'
                 }
               }
             ],
             'or',
             {
-              roles: {
-                'contains': 'owner'
+              content: {
+                '=': 'test'
               },
-              age: {
-                '=': 33
+              status: {
+                '=': 'flagged'
               }
             }
           ]
         }
 
-        assert.objectsEqual(await adapter.findAll(Post, query), [post1, post3, post5])
+        assert.objectsEqual(await adapter.findAll(Post, query), [posts[0], posts[2], posts[4]])
       })
     }
   })
