@@ -14,6 +14,7 @@
   "files": [
     "dist/",
     "src/",
+    "test/",
     "AUTHORS",
     "CONTRIBUTORS",
     "typings.json"
