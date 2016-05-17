@@ -1,3 +1,8 @@
+##### 0.7.1 - 16 May 2016
+
+###### Bug fixes
+- Fix for findAll tests
+
 ##### 0.7.0 - 16 May 2016
 
 ###### Breaking changes

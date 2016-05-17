@@ -125,8 +125,5 @@ addHiddenPropsToTarget(MockAdapter.prototype, {
       records[i] = collection.add(record)
     })
     return [records, {}]
-  },
-  getCollection (mapper) {
-    return getCollection(mapper)
   }
 })
