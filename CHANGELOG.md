@@ -1,3 +1,11 @@
+##### 0.7.2 - 17 May 2016
+
+###### Bug fixes
+- Improve findAllGroupedWhere test
+
+###### Other
+- Tweak deps
+
 ##### 0.7.1 - 16 May 2016
 
 ###### Bug fixes
