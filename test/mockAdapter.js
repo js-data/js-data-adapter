@@ -1,4 +1,4 @@
-var Adapter = require('../').Adapter
+var Adapter = require('../src/index').Adapter
 var JSData = require('js-data')
 var Collection = JSData.Collection
 var utils = JSData.utils
@@ -8,7 +8,7 @@ var deepMixIn = utils.deepMixIn
 var isUndefined = utils.isUndefined
 var plainCopy = utils.plainCopy
 
-function MockAdapter (opts) {
+export default function MockAdapter (opts) {
   Adapter.call(this, opts)
 }
 
@@ -41,7 +41,8 @@ function getCollection (mapper) {
   if (collections[mapper.name]) {
     return collections[mapper.name]
   }
-  return collections[mapper.name] = new Collection([], { mapper: mapper })
+  var collection = collections[mapper.name] = new Collection([], { mapper: mapper })
+  return collection
 }
 
 addHiddenPropsToTarget(MockAdapter.prototype, {
@@ -124,7 +125,8 @@ addHiddenPropsToTarget(MockAdapter.prototype, {
       records[i] = collection.add(record)
     })
     return [records, {}]
+  },
+  getCollection (mapper) {
+    return getCollection(mapper)
   }
 })
-
-module.exports = MockAdapter
