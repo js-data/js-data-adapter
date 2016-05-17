@@ -8,7 +8,7 @@ machine:
 dependencies:
   pre:
     - npm i -g npm
-    - npm i -g codecov nyc
+    - npm i -g codecov nyc js-data@beta
 test:
   post:
     - nyc report --reporter=lcov | codecov
