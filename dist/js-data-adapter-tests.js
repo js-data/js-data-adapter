@@ -150,8 +150,9 @@
                 assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props');
                 assert.isObject(args[2], 'afterCreate should have received options');
                 assert.isObject(args[3], 'afterCreate should have received record');
+                adapter.afterCreate.restore();
 
-              case 18:
+              case 19:
               case 'end':
                 return _context.stop();
             }
@@ -195,8 +196,9 @@
                 assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props');
                 assert.isObject(args[2], 'afterCreate should have received options');
                 assert.isObject(args[3], 'afterCreate should have received record');
+                adapter.afterCreate.restore();
 
-              case 17:
+              case 18:
               case 'end':
                 return _context2.stop();
             }
@@ -241,8 +243,9 @@
                 assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props');
                 assert.isDefined(args[2], 'afterCreate should have received options');
                 assert.isObject(args[3], 'afterCreate should have received record');
+                adapter.afterCreate.restore();
 
-              case 18:
+              case 19:
               case 'end':
                 return _context3.stop();
             }
@@ -286,8 +289,9 @@
                 assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props');
                 assert.isObject(args[2], 'afterCreate should have received options');
                 assert.isObject(args[3], 'afterCreate should have received record');
+                adapter.afterCreate.restore();
 
-              case 17:
+              case 18:
               case 'end':
                 return _context4.stop();
             }
@@ -334,8 +338,9 @@
                 assert.isObject(args[3], 'afterCreate should have received result');
                 assert.equal(args[3].created, 1, 'result.created');
                 assert.isObject(args[3].data, 'result.data');
+                adapter.afterCreate.restore();
 
-              case 21:
+              case 22:
               case 'end':
                 return _context5.stop();
             }
@@ -404,8 +409,9 @@
                 assert.isDefined(args[4], 'afterUpdate should have received updated record');
                 assert.equal(args[4][User.idAttribute], userId, 'args[4].' + User.idAttribute);
                 assert.equal(args[4].name, 'Johnny', 'args[4].name');
+                adapter.afterUpdate.restore();
 
-              case 30:
+              case 31:
               case 'end':
                 return _context.stop();
             }
@@ -468,8 +474,9 @@
                 assert.isDefined(args[4].data, 'args[4].data');
                 assert.equal(args[4].data[User.idAttribute], userId, 'args[4].data.' + User.idAttribute);
                 assert.equal(args[4].data.name, 'Johnny', 'args[4].data.name');
+                adapter.afterUpdate.restore();
 
-              case 33:
+              case 34:
               case 'end':
                 return _context2.stop();
             }
@@ -529,8 +536,9 @@
                 assert.isDefined(args[4], 'afterUpdate should have received updated record');
                 assert.equal(args[4][User.idAttribute], userId, 'args[4].' + User.idAttribute);
                 assert.equal(args[4].name, 'Johnny', 'args[4].name');
+                adapter.afterUpdate.restore();
 
-              case 29:
+              case 30:
               case 'end':
                 return _context3.stop();
             }
@@ -591,8 +599,9 @@
                 assert.isDefined(args[4], 'afterUpdate should have received updated record');
                 assert.equal(args[4][User.idAttribute], userId, 'args[4].' + User.idAttribute);
                 assert.equal(args[4].name, 'Johnny', 'args[4].name');
+                adapter.afterUpdate.restore();
 
-              case 30:
+              case 31:
               case 'end':
                 return _context4.stop();
             }
@@ -652,8 +661,9 @@
                 assert.isDefined(args[4], 'afterUpdate should have received updated record');
                 assert.equal(args[4][User.idAttribute], userId, 'args[4].' + User.idAttribute);
                 assert.equal(args[4].name, 'Johnny', 'args[4].name');
+                adapter.afterUpdate.restore();
 
-              case 29:
+              case 30:
               case 'end':
                 return _context5.stop();
             }
@@ -705,8 +715,9 @@
                 assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper');
                 assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props');
                 assert.isObject(args[2], 'beforeCreate should have received options');
+                adapter.beforeCreate.restore();
 
-              case 17:
+              case 18:
               case 'end':
                 return _context.stop();
             }
@@ -750,8 +761,9 @@
                 assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper');
                 assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props');
                 assert.isObject(args[2], 'beforeCreate should have received options');
+                adapter.beforeCreate.restore();
 
-              case 17:
+              case 18:
               case 'end':
                 return _context2.stop();
             }
@@ -795,8 +807,9 @@
                 assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper');
                 assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props');
                 assert.isDefined(args[2], 'beforeCreate should have received options');
+                adapter.beforeCreate.restore();
 
-              case 17:
+              case 18:
               case 'end':
                 return _context3.stop();
             }
@@ -840,8 +853,9 @@
                 assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper');
                 assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props');
                 assert.isObject(args[2], 'beforeCreate should have received options');
+                adapter.beforeCreate.restore();
 
-              case 17:
+              case 18:
               case 'end':
                 return _context4.stop();
             }
@@ -905,9 +919,10 @@
                 assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper');
                 assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id');
                 assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props');
-                assert.isObject(args[3], 'beforeCreate should have received options');
+                assert.isObject(args[3], 'beforeUpdate should have received options');
+                adapter.beforeUpdate.restore();
 
-              case 26:
+              case 27:
               case 'end':
                 return _context.stop();
             }
@@ -963,9 +978,10 @@
                 assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper');
                 assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id');
                 assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props');
-                assert.isObject(args[3], 'beforeCreate should have received options');
+                assert.isObject(args[3], 'beforeUpdate should have received options');
+                adapter.beforeUpdate.restore();
 
-              case 26:
+              case 27:
               case 'end':
                 return _context2.stop();
             }
@@ -1021,9 +1037,10 @@
                 assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper');
                 assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id');
                 assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props');
-                assert.isObject(args[3], 'beforeCreate should have received options');
+                assert.isObject(args[3], 'beforeUpdate should have received options');
+                adapter.beforeUpdate.restore();
 
-              case 26:
+              case 27:
               case 'end':
                 return _context3.stop();
             }
@@ -1079,9 +1096,10 @@
                 assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper');
                 assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id');
                 assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props');
-                assert.isObject(args[3], 'beforeCreate should have received options');
+                assert.isObject(args[3], 'beforeUpdate should have received options');
+                adapter.beforeUpdate.restore();
 
-              case 26:
+              case 27:
               case 'end':
                 return _context4.stop();
             }
@@ -4121,6 +4139,65 @@
             }
           }
         }, _callee3, this, [[3, 9]]);
+      })));
+      it('should keep relations specified by "with"', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        var adapter, store, result;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                adapter = this.$$adapter;
+                store = this.$$container;
+
+
+                sinon.stub(adapter, '_update', function (mapper, id, props, opts) {
+                  assert.deepEqual(props.posts, [{
+                    id: 1234,
+                    userId: 1
+                  }]);
+                  assert.deepEqual(props.profile, {
+                    id: 238,
+                    userId: 1
+                  });
+                  assert.equal(props.address, undefined);
+                  assert.equal(props.organization, undefined);
+                  return [props, {}];
+                });
+
+                assert.debug('update', 1, { id: 1 });
+                _context4.next = 6;
+                return store.update('user', 1, {
+                  id: 1,
+                  posts: [{
+                    id: 1234,
+                    userId: 1
+                  }],
+                  address: {
+                    id: 412,
+                    userId: 1
+                  },
+                  profile: {
+                    id: 238,
+                    userId: 1
+                  },
+                  organizationId: 333,
+                  organization: {
+                    id: 333
+                  }
+                }, { with: ['posts', 'profile'] });
+
+              case 6:
+                result = _context4.sent;
+
+                assert.debug('updated', 1, result);
+                adapter._update.restore();
+
+              case 9:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
       })));
     });
   }

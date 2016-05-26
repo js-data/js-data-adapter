@@ -103,8 +103,14 @@
     return final;
   };
 
-  var withoutRelations = function withoutRelations(mapper, props) {
-    return jsData.utils.omit(props, mapper.relationFields || []);
+  var withoutRelations = function withoutRelations(mapper, props, opts) {
+    opts || (opts = {});
+    opts.with || (opts.with = []);
+    var relationFields = mapper.relationFields || [];
+    var toStrip = relationFields.filter(function (value) {
+      return opts.with.indexOf(value) === -1;
+    });
+    return jsData.utils.omit(props, toStrip);
   };
 
   var DEFAULTS = {
@@ -745,7 +751,7 @@
       return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
         props = jsData.utils.isUndefined(_props) ? props : _props;
-        props = withoutRelations(mapper, props);
+        props = withoutRelations(mapper, props, opts);
         op = opts.op = 'create';
         self.dbg(op, mapper, props, opts);
         return jsData.utils.resolve(self._create(mapper, props, opts));
@@ -794,7 +800,7 @@
         // Allow for re-assignment from lifecycle hook
         props = jsData.utils.isUndefined(_props) ? props : _props;
         props = props.map(function (record) {
-          return withoutRelations(mapper, record);
+          return withoutRelations(mapper, record, opts);
         });
         op = opts.op = 'createMany';
         self.dbg(op, mapper, props, opts);
@@ -1497,7 +1503,7 @@
       return jsData.utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
         props = jsData.utils.isUndefined(_props) ? props : _props;
-        props = withoutRelations(mapper, props);
+        props = withoutRelations(mapper, props, opts);
         op = opts.op = 'update';
         self.dbg(op, mapper, id, props, opts);
         return jsData.utils.resolve(self._update(mapper, id, props, opts));
@@ -1554,7 +1560,7 @@
       return jsData.utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
         props = jsData.utils.isUndefined(_props) ? props : _props;
-        props = withoutRelations(mapper, props);
+        props = withoutRelations(mapper, props, opts);
         op = opts.op = 'updateAll';
         self.dbg(op, mapper, props, query, opts);
         return jsData.utils.resolve(self._updateAll(mapper, props, query, opts));
@@ -1609,7 +1615,7 @@
         // Allow for re-assignment from lifecycle hook
         records = jsData.utils.isUndefined(_records) ? records : _records;
         records = records.map(function (record) {
-          return withoutRelations(mapper, record);
+          return withoutRelations(mapper, record, opts);
         });
         op = opts.op = 'updateMany';
         self.dbg(op, mapper, records, opts);
