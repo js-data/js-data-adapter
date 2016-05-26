@@ -35,7 +35,8 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper')
       assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id')
       assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props')
-      assert.isObject(args[3], 'beforeCreate should have received options')
+      assert.isObject(args[3], 'beforeUpdate should have received options')
+      adapter.beforeUpdate.restore()
     })
     it('should allow re-assignment', async function () {
       const adapter = this.$$adapter
@@ -69,7 +70,8 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper')
       assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id')
       assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props')
-      assert.isObject(args[3], 'beforeCreate should have received options')
+      assert.isObject(args[3], 'beforeUpdate should have received options')
+      adapter.beforeUpdate.restore()
     })
     it('should allow returning a promise', async function () {
       const adapter = this.$$adapter
@@ -103,7 +105,8 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper')
       assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id')
       assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props')
-      assert.isObject(args[3], 'beforeCreate should have received options')
+      assert.isObject(args[3], 'beforeUpdate should have received options')
+      adapter.beforeUpdate.restore()
     })
     it('should allow returning a promise and re-assignment', async function () {
       const adapter = this.$$adapter
@@ -137,7 +140,8 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeUpdate should have received User mapper')
       assert.isTrue(args[1] === userId, 'beforeUpdate should have received user id')
       assert.objectsEqual(args[2], { name: 'Johnny' }, 'beforeUpdate should have received update props')
-      assert.isObject(args[3], 'beforeCreate should have received options')
+      assert.isObject(args[3], 'beforeUpdate should have received options')
+      adapter.beforeUpdate.restore()
     })
   })
 }

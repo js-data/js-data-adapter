@@ -71,5 +71,50 @@ export default function (options) {
         assert.equal(err.message, 'Not Found', 'err.message should be "Not Found"')
       }
     })
+    it('should keep relations specified by "with"', async function () {
+      const adapter = this.$$adapter
+      const store = this.$$container
+
+      sinon.stub(adapter, '_update', function (mapper, id, props, opts) {
+        assert.deepEqual(props.posts, [
+          {
+            id: 1234,
+            userId: 1
+          }
+        ])
+        assert.deepEqual(props.profile, {
+          id: 238,
+          userId: 1
+        })
+        assert.equal(props.address, undefined)
+        assert.equal(props.organization, undefined)
+        return [props, {}]
+      })
+
+      assert.debug('update', 1, { id: 1 })
+      const result = await store.update('user', 1, {
+        id: 1,
+        posts: [
+          {
+            id: 1234,
+            userId: 1
+          }
+        ],
+        address: {
+          id: 412,
+          userId: 1
+        },
+        profile: {
+          id: 238,
+          userId: 1
+        },
+        organizationId: 333,
+        organization: {
+          id: 333
+        }
+      }, { with: ['posts', 'profile'] })
+      assert.debug('updated', 1, result)
+      adapter._update.restore()
+    })
   })
 }

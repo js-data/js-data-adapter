@@ -28,8 +28,14 @@ export const unique = function (array) {
   return final
 }
 
-export const withoutRelations = function (mapper, props) {
-  return utils.omit(props, mapper.relationFields || [])
+export const withoutRelations = function (mapper, props, opts) {
+  opts || (opts = {})
+  opts.with || (opts.with = [])
+  const relationFields = mapper.relationFields || []
+  const toStrip = relationFields.filter(function (value) {
+    return opts.with.indexOf(value) === -1
+  })
+  return utils.omit(props, toStrip)
 }
 
 const DEFAULTS = {
@@ -667,7 +673,7 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
     return utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       props = utils.isUndefined(_props) ? props : _props
-      props = withoutRelations(mapper, props)
+      props = withoutRelations(mapper, props, opts)
       op = opts.op = 'create'
       self.dbg(op, mapper, props, opts)
       return utils.resolve(self._create(mapper, props, opts))
@@ -711,7 +717,7 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
       // Allow for re-assignment from lifecycle hook
       props = utils.isUndefined(_props) ? props : _props
       props = props.map(function (record) {
-        return withoutRelations(mapper, record)
+        return withoutRelations(mapper, record, opts)
       })
       op = opts.op = 'createMany'
       self.dbg(op, mapper, props, opts)
@@ -1363,7 +1369,7 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
     return utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       props = utils.isUndefined(_props) ? props : _props
-      props = withoutRelations(mapper, props)
+      props = withoutRelations(mapper, props, opts)
       op = opts.op = 'update'
       self.dbg(op, mapper, id, props, opts)
       return utils.resolve(self._update(mapper, id, props, opts))
@@ -1415,7 +1421,7 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
     return utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       props = utils.isUndefined(_props) ? props : _props
-      props = withoutRelations(mapper, props)
+      props = withoutRelations(mapper, props, opts)
       op = opts.op = 'updateAll'
       self.dbg(op, mapper, props, query, opts)
       return utils.resolve(self._updateAll(mapper, props, query, opts))
@@ -1465,7 +1471,7 @@ utils.addHiddenPropsToTarget(Adapter.prototype, {
       // Allow for re-assignment from lifecycle hook
       records = utils.isUndefined(_records) ? records : _records
       records = records.map(function (record) {
-        return withoutRelations(mapper, record)
+        return withoutRelations(mapper, record, opts)
       })
       op = opts.op = 'updateMany'
       self.dbg(op, mapper, records, opts)

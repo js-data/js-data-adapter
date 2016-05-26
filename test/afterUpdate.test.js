@@ -40,6 +40,7 @@ export default function (options) {
       assert.isDefined(args[4], 'afterUpdate should have received updated record')
       assert.equal(args[4][User.idAttribute], userId, `args[4].${User.idAttribute}`)
       assert.equal(args[4].name, 'Johnny', 'args[4].name')
+      adapter.afterUpdate.restore()
     })
     it('should receive raw', async function () {
       const adapter = this.$$adapter
@@ -80,6 +81,7 @@ export default function (options) {
       assert.isDefined(args[4].data, 'args[4].data')
       assert.equal(args[4].data[User.idAttribute], userId, `args[4].data.${User.idAttribute}`)
       assert.equal(args[4].data.name, 'Johnny', 'args[4].data.name')
+      adapter.afterUpdate.restore()
     })
     it('should allow re-assignment', async function () {
       const adapter = this.$$adapter
@@ -117,6 +119,7 @@ export default function (options) {
       assert.isDefined(args[4], 'afterUpdate should have received updated record')
       assert.equal(args[4][User.idAttribute], userId, `args[4].${User.idAttribute}`)
       assert.equal(args[4].name, 'Johnny', 'args[4].name')
+      adapter.afterUpdate.restore()
     })
     it('should allow returning a promise', async function () {
       const adapter = this.$$adapter
@@ -155,6 +158,7 @@ export default function (options) {
       assert.isDefined(args[4], 'afterUpdate should have received updated record')
       assert.equal(args[4][User.idAttribute], userId, `args[4].${User.idAttribute}`)
       assert.equal(args[4].name, 'Johnny', 'args[4].name')
+      adapter.afterUpdate.restore()
     })
     it('should allow returning a promise and re-assignment', async function () {
       const adapter = this.$$adapter
@@ -192,6 +196,7 @@ export default function (options) {
       assert.isDefined(args[4], 'afterUpdate should have received updated record')
       assert.equal(args[4][User.idAttribute], userId, `args[4].${User.idAttribute}`)
       assert.equal(args[4].name, 'Johnny', 'args[4].name')
+      adapter.afterUpdate.restore()
     })
   })
 }
