@@ -29,6 +29,7 @@ export default function (options) {
       assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props')
       assert.isObject(args[2], 'afterCreate should have received options')
       assert.isObject(args[3], 'afterCreate should have received record')
+      adapter.afterCreate.restore()
     })
     it('should allow re-assignment', async function () {
       const adapter = this.$$adapter
@@ -55,6 +56,7 @@ export default function (options) {
       assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props')
       assert.isObject(args[2], 'afterCreate should have received options')
       assert.isObject(args[3], 'afterCreate should have received record')
+      adapter.afterCreate.restore()
     })
     it('should allow returning a promise', async function () {
       const adapter = this.$$adapter
@@ -82,6 +84,7 @@ export default function (options) {
       assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props')
       assert.isDefined(args[2], 'afterCreate should have received options')
       assert.isObject(args[3], 'afterCreate should have received record')
+      adapter.afterCreate.restore()
     })
     it('should allow returning a promise and re-assignment', async function () {
       const adapter = this.$$adapter
@@ -108,6 +111,7 @@ export default function (options) {
       assert.objectsEqual(args[1], { name: 'John' }, 'afterCreate should have received create props')
       assert.isObject(args[2], 'afterCreate should have received options')
       assert.isObject(args[3], 'afterCreate should have received record')
+      adapter.afterCreate.restore()
     })
     it('should receive raw', async function () {
       const adapter = this.$$adapter
@@ -137,6 +141,7 @@ export default function (options) {
       assert.isObject(args[3], 'afterCreate should have received result')
       assert.equal(args[3].created, 1, 'result.created')
       assert.isObject(args[3].data, 'result.data')
+      adapter.afterCreate.restore()
     })
   })
 }

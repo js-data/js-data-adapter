@@ -1,3 +1,8 @@
+##### 0.7.3 - 25 May 2016
+
+###### Bug fixes
+- Relations specified by `opts.with` weren't being passed through
+
 ##### 0.7.2 - 17 May 2016
 
 ###### Bug fixes

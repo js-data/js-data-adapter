@@ -28,6 +28,7 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper')
       assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props')
       assert.isObject(args[2], 'beforeCreate should have received options')
+      adapter.beforeCreate.restore()
     })
     it('should allow re-assignment', async function () {
       const adapter = this.$$adapter
@@ -54,6 +55,7 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper')
       assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props')
       assert.isObject(args[2], 'beforeCreate should have received options')
+      adapter.beforeCreate.restore()
     })
     it('should allow returning a promise', async function () {
       const adapter = this.$$adapter
@@ -80,6 +82,7 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper')
       assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props')
       assert.isDefined(args[2], 'beforeCreate should have received options')
+      adapter.beforeCreate.restore()
     })
     it('should allow returning a promise and re-assignment', async function () {
       const adapter = this.$$adapter
@@ -106,6 +109,7 @@ export default function (options) {
       assert.isTrue(args[0] === User, 'beforeCreate should have received User mapper')
       assert.objectsEqual(args[1], { name: 'John' }, 'beforeCreate should have received create props')
       assert.isObject(args[2], 'beforeCreate should have received options')
+      adapter.beforeCreate.restore()
     })
   })
 }
