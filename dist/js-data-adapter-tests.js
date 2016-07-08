@@ -6,14 +6,13 @@
 
   sinon$1 = 'default' in sinon$1 ? sinon$1['default'] : sinon$1;
 
-  var babelHelpers = {};
-  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
     return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
-  babelHelpers.asyncToGenerator = function (fn) {
+  var asyncToGenerator = function (fn) {
     return function () {
       var gen = fn.apply(this, arguments);
       return new Promise(function (resolve, reject) {
@@ -42,13 +41,13 @@
     };
   };
 
-  babelHelpers.classCallCheck = function (instance, Constructor) {
+  var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   };
 
-  babelHelpers.createClass = function () {
+  var createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -66,7 +65,7 @@
     };
   }();
 
-  babelHelpers.defineProperty = function (obj, key, value) {
+  var defineProperty = function (obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -81,7 +80,7 @@
     return obj;
   };
 
-  babelHelpers.inherits = function (subClass, superClass) {
+  var inherits = function (subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
     }
@@ -97,7 +96,7 @@
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   };
 
-  babelHelpers.possibleConstructorReturn = function (self, call) {
+  var possibleConstructorReturn = function (self, call) {
     if (!self) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -105,15 +104,13 @@
     return call && (typeof call === "object" || typeof call === "function") ? call : self;
   };
 
-  babelHelpers;
-
   /* global assert:true */
   function afterCreateTest (options) {
     describe('Adapter#afterCreate', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.afterCreate), 'function', 'adapter should have a "afterCreate" method');
+        assert.equal(_typeof(this.$$adapter.afterCreate), 'function', 'adapter should have a "afterCreate" method');
       });
-      it('should call afterCreate', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should call afterCreate', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -159,7 +156,7 @@
           }
         }, _callee, this);
       })));
-      it('should allow re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should allow re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -205,7 +202,7 @@
           }
         }, _callee2, this);
       })));
-      it('should allow returning a promise', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should allow returning a promise', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -252,7 +249,7 @@
           }
         }, _callee3, this);
       })));
-      it('should allow returning a promise and re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should allow returning a promise and re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -298,7 +295,7 @@
           }
         }, _callee4, this);
       })));
-      it('should receive raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+      it('should receive raw', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var adapter, User, props, result, args;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
@@ -354,9 +351,9 @@
   function afterUpdateTest (options) {
     describe('Adapter#afterUpdate', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.afterUpdate), 'function', 'adapter should have a "afterUpdate" method');
+        assert.equal(_typeof(this.$$adapter.afterUpdate), 'function', 'adapter should have a "afterUpdate" method');
       });
-      it('should call afterUpdate', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should call afterUpdate', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -418,7 +415,7 @@
           }
         }, _callee, this);
       })));
-      it('should receive raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should receive raw', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, userId, result, args;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -483,7 +480,7 @@
           }
         }, _callee2, this);
       })));
-      it('should allow re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should allow re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -545,7 +542,7 @@
           }
         }, _callee3, this);
       })));
-      it('should allow returning a promise', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should allow returning a promise', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -608,7 +605,7 @@
           }
         }, _callee4, this);
       })));
-      it('should allow returning a promise and re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+      it('should allow returning a promise and re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
@@ -677,9 +674,9 @@
   function beforeCreateTest (options) {
     describe('Adapter#beforeCreate', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.beforeCreate), 'function', 'adapter should have a "beforeCreate" method');
+        assert.equal(_typeof(this.$$adapter.beforeCreate), 'function', 'adapter should have a "beforeCreate" method');
       });
-      it('should call beforeCreate', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should call beforeCreate', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -724,7 +721,7 @@
           }
         }, _callee, this);
       })));
-      it('should allow re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should allow re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -770,7 +767,7 @@
           }
         }, _callee2, this);
       })));
-      it('should allow returning a promise', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should allow returning a promise', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -816,7 +813,7 @@
           }
         }, _callee3, this);
       })));
-      it('should allow returning a promise and re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should allow returning a promise and re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, User, props, user, args;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -869,9 +866,9 @@
   function beforeUpdateTest (options) {
     describe('Adapter#beforeUpdate', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.beforeUpdate), 'function', 'adapter should have a "beforeUpdate" method');
+        assert.equal(_typeof(this.$$adapter.beforeUpdate), 'function', 'adapter should have a "beforeUpdate" method');
       });
-      it('should call beforeUpdate', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should call beforeUpdate', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -929,7 +926,7 @@
           }
         }, _callee, this);
       })));
-      it('should allow re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should allow re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -988,7 +985,7 @@
           }
         }, _callee2, this);
       })));
-      it('should allow returning a promise', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should allow returning a promise', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -1047,7 +1044,7 @@
           }
         }, _callee3, this);
       })));
-      it('should allow returning a promise and re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should allow returning a promise and re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, User, props, user, userId, updatedUser, args;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -1113,9 +1110,9 @@
   function countTest (options) {
     describe('Adapter#count', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.count), 'function', 'adapter should have a "count" method');
+        assert.equal(_typeof(this.$$adapter.count), 'function', 'adapter should have a "count" method');
       });
-      it('should count users', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should count users', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, count, user, user2;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1241,7 +1238,7 @@
           }
         }, _callee, this);
       })));
-      it('should count users and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should count users and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, result;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -1285,9 +1282,9 @@
   function createTest (options) {
     describe('Adapter#create', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.create), 'function', 'adapter should have a "create" method');
+        assert.equal(_typeof(this.$$adapter.create), 'function', 'adapter should have a "create" method');
       });
-      it('should create a user', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should create a user', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, userId, foundUser;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1338,9 +1335,9 @@
   function createManyTest (options) {
     describe('Adapter#createMany', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.createMany), 'function', 'adapter should have a "createMany" method');
+        assert.equal(_typeof(this.$$adapter.createMany), 'function', 'adapter should have a "createMany" method');
       });
-      it('should create multiple users', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should create multiple users', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, user1, user2, users, users3;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1396,9 +1393,9 @@
   function destroyTest (options) {
     describe('Adapter#destroy', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.destroy), 'function', 'adapter should have a "destroy" method');
+        assert.equal(_typeof(this.$$adapter.destroy), 'function', 'adapter should have a "destroy" method');
       });
-      it('should destroy a user', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should destroy a user', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, userId, beforeDestroyCalled, afterDestroyCalled, destroyedUser;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1460,7 +1457,7 @@
           }
         }, _callee, this);
       })));
-      it('should destroy a user and allow afterDestroy re-assignment', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should destroy a user and allow afterDestroy re-assignment', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, userId, beforeDestroyCalled, afterDestroyCalled, destroyedUser;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -1522,7 +1519,7 @@
           }
         }, _callee2, this);
       })));
-      it('should destroy a user and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should destroy a user and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User, props, user, userId, result;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -1564,7 +1561,7 @@
           }
         }, _callee3, this);
       })));
-      it('should destroy nothing', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should destroy nothing', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, User, result;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -1591,7 +1588,7 @@
           }
         }, _callee4, this);
       })));
-      it('should destroy nothing and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+      it('should destroy nothing and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var adapter, User, result;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
@@ -1629,9 +1626,9 @@
   function destroyAllTest (options) {
     describe('Adapter#destroyAll', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.destroyAll), 'function', 'adapter should have a "destroyAll" method');
+        assert.equal(_typeof(this.$$adapter.destroyAll), 'function', 'adapter should have a "destroyAll" method');
       });
-      it('should destroy all users', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should destroy all users', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, userId, user2, foundUsers, destroyedUsers;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1710,7 +1707,7 @@
           }
         }, _callee, this);
       })));
-      it('should destroy users and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should destroy users and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, result;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -1751,7 +1748,7 @@
           }
         }, _callee2, this);
       })));
-      it('should destroy nothing', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should destroy nothing', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User, result;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -1778,7 +1775,7 @@
           }
         }, _callee3, this);
       })));
-      it('should destroy nothing and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should destroy nothing and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, User, result;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -1816,7 +1813,7 @@
   function extendTest (options) {
     describe('Adapter.extend', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.constructor.extend), 'function', 'adapter constructor function should have an "extend" method');
+        assert.equal(_typeof(this.$$adapter.constructor.extend), 'function', 'adapter constructor function should have an "extend" method');
       });
       it('should return a subclass of the adapter class using extend', function () {
         var Adapter = this.$$adapter.constructor;
@@ -1835,7 +1832,7 @@
         try {
           assert.isTrue(SubAdapter.extend === Adapter.extend, 'should have same static methods');
         } catch (err) {
-          assert.equal(babelHelpers.typeof(SubAdapter.extend), 'function', 'should have same static methods');
+          assert.equal(_typeof(SubAdapter.extend), 'function', 'should have same static methods');
         }
 
         var subAdapter = new SubAdapter();
@@ -1847,14 +1844,14 @@
         var Adapter = this.$$adapter.constructor;
 
         var SubAdapter = function (_Adapter) {
-          babelHelpers.inherits(SubAdapter, _Adapter);
+          inherits(SubAdapter, _Adapter);
 
           function SubAdapter() {
-            babelHelpers.classCallCheck(this, SubAdapter);
-            return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SubAdapter).apply(this, arguments));
+            classCallCheck(this, SubAdapter);
+            return possibleConstructorReturn(this, Object.getPrototypeOf(SubAdapter).apply(this, arguments));
           }
 
-          babelHelpers.createClass(SubAdapter, [{
+          createClass(SubAdapter, [{
             key: 'foo',
             value: function foo() {
               return 'foo';
@@ -1873,7 +1870,7 @@
           assert.isTrue(SubAdapter.extend === Adapter.extend, 'should have same static methods');
         } catch (err) {
           try {
-            assert.equal(babelHelpers.typeof(SubAdapter.extend), 'function', 'should have same static methods');
+            assert.equal(_typeof(SubAdapter.extend), 'function', 'should have same static methods');
           } catch (err) {
             var obj = {};
             if (obj.setPrototypeOf) {
@@ -1905,10 +1902,10 @@
       });
 
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(adapter.find), 'function', 'adapter should have a "find" method');
+        assert.equal(_typeof(adapter.find), 'function', 'adapter should have a "find" method');
       });
 
-      it('should find a user', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should find a user', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var props, user, userId, beforeFindCalled, afterFindCalled, foundUser, post, postId, comments, foundPost;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1979,7 +1976,7 @@
                   assert.isObject(opts, 'afterFind should have received opts argument');
                   assert.isObject(record, 'afterFind should have received record argument');
                   // Test re-assignment
-                  return Promise.resolve(babelHelpers.defineProperty({ name: 'Sally' }, User.idAttribute, userId));
+                  return Promise.resolve(defineProperty({ name: 'Sally' }, User.idAttribute, userId));
                 };
 
                 assert.debug('find', User.name, userId);
@@ -2058,7 +2055,7 @@
         }, _callee, this);
       })));
 
-      it('should return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var props, user, userId, result;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -2101,7 +2098,7 @@
         }, _callee2, this);
       })));
 
-      it('should return nothing', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should return nothing', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var result;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -2125,7 +2122,7 @@
         }, _callee3, this);
       })));
 
-      it('should return raw and nothing', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should return raw and nothing', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var result;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -2151,7 +2148,7 @@
         }, _callee4, this);
       })));
 
-      it('should load belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+      it('should load belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var props, user, profile, post, comment;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
@@ -2222,7 +2219,7 @@
         }, _callee5, this);
       })));
 
-      it('should load belongsTo relations and filter sub queries', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+      it('should load belongsTo relations and filter sub queries', asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
         var props, user, user2, post, post2, post3, post4;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
@@ -2350,7 +2347,7 @@
       })));
 
       if (options.hasFeature('findBelongsToNested')) {
-        it('should load belongsTo relations (nested)', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+        it('should load belongsTo relations (nested)', asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
           var props, user, profile, post, comment;
           return regeneratorRuntime.wrap(function _callee7$(_context7) {
             while (1) {
@@ -2424,7 +2421,7 @@
         })));
       }
 
-      it('should load hasMany and belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+      it('should load hasMany and belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
         var props, user, profile, post, postId, comment;
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
@@ -2496,7 +2493,7 @@
       })));
 
       if (options.hasFeature('findBelongsToHasManyNested')) {
-        it('should load hasMany and belongsTo relations (nested)', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+        it('should load hasMany and belongsTo relations (nested)', asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
           var props, user, profile, post, postId, comment;
           return regeneratorRuntime.wrap(function _callee9$(_context9) {
             while (1) {
@@ -2571,7 +2568,7 @@
       }
 
       if (options.hasFeature('findHasManyLocalKeys')) {
-        it('should load hasMany localKeys (array) relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+        it('should load hasMany localKeys (array) relations', asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
           var props, tag, tag2, post, postId;
           return regeneratorRuntime.wrap(function _callee10$(_context10) {
             while (1) {
@@ -2632,7 +2629,7 @@
             }
           }, _callee10, this);
         })));
-        it('should load hasMany localKeys (empty array) relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+        it('should load hasMany localKeys (empty array) relations', asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
           var props, post, postId;
           return regeneratorRuntime.wrap(function _callee11$(_context11) {
             while (1) {
@@ -2671,7 +2668,7 @@
             }
           }, _callee11, this);
         })));
-        it('should load hasMany localKeys (object) relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+        it('should load hasMany localKeys (object) relations', asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
           var _tagIds;
 
           var props, tag, tag2, post, postId;
@@ -2702,7 +2699,7 @@
 
                   assert.debug('created', Tag.name, tag2);
 
-                  props = { content: 'test', tagIds: (_tagIds = {}, babelHelpers.defineProperty(_tagIds, tag[Tag.idAttribute], true), babelHelpers.defineProperty(_tagIds, tag2[Tag.idAttribute], true), _tagIds) };
+                  props = { content: 'test', tagIds: (_tagIds = {}, defineProperty(_tagIds, tag[Tag.idAttribute], true), defineProperty(_tagIds, tag2[Tag.idAttribute], true), _tagIds) };
                   assert.debug('create', Post.name, props);
                   _context12.next = 18;
                   return adapter.create(Post, props);
@@ -2737,7 +2734,7 @@
       }
 
       if (options.hasFeature('findHasManyForeignKeys')) {
-        it('should load hasMany foreignKeys (array) relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+        it('should load hasMany foreignKeys (array) relations', asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
           var props, tag, tagId, tag2, tag2Id, post, post2;
           return regeneratorRuntime.wrap(function _callee13$(_context13) {
             while (1) {
@@ -2840,10 +2837,10 @@
       });
 
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(adapter.findAll), 'function', 'adapter should have a "findAll" method');
+        assert.equal(_typeof(adapter.findAll), 'function', 'adapter should have a "findAll" method');
       });
 
-      it('should filter users', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should filter users', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var props, users, user, userId, users2;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -2894,7 +2891,7 @@
       })));
 
       if (options.hasFeature('findAllInOp')) {
-        it('should filter users using the "in" operator', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        it('should filter users using the "in" operator', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
           var users, user, id, users2;
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
@@ -2940,7 +2937,7 @@
       }
 
       if (options.hasFeature('findAllLikeOp')) {
-        it('should filter users using the "like" operator', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        it('should filter users using the "like" operator', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
           var users, user, id, users2;
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -3008,7 +3005,7 @@
       }
 
       if (options.hasFeature('findAllBelongsTo')) {
-        it('should load belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        it('should load belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
           var props, user, profile, post, comment, user2, post2, comment2, comments;
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -3110,7 +3107,7 @@
           }, _callee4, this);
         })));
 
-        it('should load belongsTo relations and filter sub queries', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        it('should load belongsTo relations and filter sub queries', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
           var props, user, user2, post, post2, post3, post4, users;
           return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
@@ -3179,9 +3176,9 @@
 
                   assert.debug('created', Post.name, post4);
 
-                  assert.debug('findAll', User.name, babelHelpers.defineProperty({}, User.idAttribute, user[User.idAttribute]));
+                  assert.debug('findAll', User.name, defineProperty({}, User.idAttribute, user[User.idAttribute]));
                   _context5.next = 41;
-                  return adapter.findAll(User, babelHelpers.defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': ['post'] });
+                  return adapter.findAll(User, defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': ['post'] });
 
                 case 41:
                   users = _context5.sent;
@@ -3192,9 +3189,9 @@
                   assert.isDefined(users[0].posts, 'users[0].posts');
                   assert.equal(users[0].posts.length, 2, 'users[0].posts.length');
 
-                  assert.debug('findAll', User.name, babelHelpers.defineProperty({}, User.idAttribute, user[User.idAttribute]));
+                  assert.debug('findAll', User.name, defineProperty({}, User.idAttribute, user[User.idAttribute]));
                   _context5.next = 49;
-                  return adapter.findAll(User, babelHelpers.defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': [{
+                  return adapter.findAll(User, defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': [{
                       relation: 'post',
                       query: {
                         status: 'published'
@@ -3210,9 +3207,9 @@
                   assert.isDefined(users[0].posts, 'users[0].posts');
                   assert.equal(users[0].posts.length, 1, 'users[0].posts.length');
 
-                  assert.debug('findAll', User.name, babelHelpers.defineProperty({}, User.idAttribute, user[User.idAttribute]));
+                  assert.debug('findAll', User.name, defineProperty({}, User.idAttribute, user[User.idAttribute]));
                   _context5.next = 57;
-                  return adapter.findAll(User, babelHelpers.defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': [{
+                  return adapter.findAll(User, defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': [{
                       relation: 'post',
                       replace: true,
                       query: {
@@ -3239,7 +3236,7 @@
       }
 
       if (options.hasFeature('findAllBelongsToNested')) {
-        it('should load belongsTo relations (nested)', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+        it('should load belongsTo relations (nested)', asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
           var props, user, profile, post, comment, user2, post2, comment2, comments;
           return regeneratorRuntime.wrap(function _callee6$(_context6) {
             while (1) {
@@ -3346,7 +3343,7 @@
       }
 
       if (options.hasFeature('findAllBelongsToHasMany')) {
-        it('should load hasMany and belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+        it('should load hasMany and belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
           var props, user, profile, post, comment, user2, post2, comment2, posts;
           return regeneratorRuntime.wrap(function _callee7$(_context7) {
             while (1) {
@@ -3450,7 +3447,7 @@
       }
 
       if (options.hasFeature('findAllBelongsToHasManyNested')) {
-        it('should load hasMany and belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+        it('should load hasMany and belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
           var props, user, profile, post, comment, user2, post2, comment2, posts;
           return regeneratorRuntime.wrap(function _callee8$(_context8) {
             while (1) {
@@ -3557,7 +3554,7 @@
       }
 
       if (options.hasFeature('filterOnRelations')) {
-        it('should filter using belongsTo relation', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+        it('should filter using belongsTo relation', asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
           var profile1, user1, post1, user2, post2, users;
           return regeneratorRuntime.wrap(function _callee9$(_context9) {
             while (1) {
@@ -3617,7 +3614,7 @@
           }, _callee9, this);
         })));
 
-        it('should filter through multiple hasOne/belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+        it('should filter through multiple hasOne/belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
           var profile1, user1, post1, profile2, user2, post2, comments;
           return regeneratorRuntime.wrap(function _callee10$(_context10) {
             while (1) {
@@ -3682,7 +3679,7 @@
           }, _callee10, this);
         })));
 
-        it('should filter using multiple hasOne/belongsTo relations', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+        it('should filter using multiple hasOne/belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
           var profile1, user1, post1, profile2, user2, post2, comments;
           return regeneratorRuntime.wrap(function _callee11$(_context11) {
             while (1) {
@@ -3748,7 +3745,7 @@
         })));
       }
 
-      it('should allow passing limit and offset as strings', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+      it('should allow passing limit and offset as strings', asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
         return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
@@ -3765,7 +3762,7 @@
       })));
 
       if (options.hasFeature('findAllGroupedWhere')) {
-        it('should support filtering grouped "where" clauses', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+        it('should support filtering grouped "where" clauses', asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
           var posts, query;
           return regeneratorRuntime.wrap(function _callee13$(_context13) {
             while (1) {
@@ -3824,9 +3821,9 @@
   function sumTest (options) {
     describe('Adapter#sum', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.sum), 'function', 'adapter should have a "sum" method');
+        assert.equal(_typeof(this.$$adapter.sum), 'function', 'adapter should have a "sum" method');
       });
-      it('should sum users\' age', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should sum users\' age', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, sum, user, user2;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -3952,7 +3949,7 @@
           }
         }, _callee, this);
       })));
-      it('should sum users\' age and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should sum users\' age and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, result;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -3996,9 +3993,9 @@
   function updateTest (options) {
     describe('Adapter#update', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.update), 'function', 'adapter should have a "update" method');
+        assert.equal(_typeof(this.$$adapter.update), 'function', 'adapter should have a "update" method');
       });
-      it('should update a user', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should update a user', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user, foundUser, updatedUser;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -4063,7 +4060,7 @@
           }
         }, _callee, this);
       })));
-      it('should update a user and return raw', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      it('should update a user and return raw', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var adapter, User, props, user, result;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -4107,7 +4104,7 @@
           }
         }, _callee2, this);
       })));
-      it('should throw when updating non-existent row', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+      it('should throw when updating non-existent row', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
         var adapter, User;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -4140,7 +4137,7 @@
           }
         }, _callee3, this, [[3, 9]]);
       })));
-      it('should keep relations specified by "with"', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+      it('should keep relations specified by "with"', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
         var adapter, store, result;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -4206,9 +4203,9 @@
   function updateAllTest (options) {
     describe('Adapter#updateAll', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.updateAll), 'function', 'adapter should have a "updateAll" method');
+        assert.equal(_typeof(this.$$adapter.updateAll), 'function', 'adapter should have a "updateAll" method');
       });
-      it('should update multiple users', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should update multiple users', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, props, user1, userId1, user2, userId2, users, users2, users3, users4;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -4347,9 +4344,9 @@
   function updateManyTest (options) {
     describe('Adapter#updateMany', function () {
       it('should exist', function () {
-        assert.equal(babelHelpers.typeof(this.$$adapter.updateMany), 'function', 'adapter should have a "updateMany" method');
+        assert.equal(_typeof(this.$$adapter.updateMany), 'function', 'adapter should have a "updateMany" method');
       });
-      it('should update multiple users', babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      it('should update multiple users', asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var adapter, User, user1, userId1, user2, userId2, users, users2, users3, users4;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -4500,7 +4497,7 @@
         return (options.features === 'all' || options.features.indexOf(feature) !== -1) && options.xfeatures.indexOf(feature) === -1;
       };
       if (!options.Adapter || typeof options.Adapter !== 'function') {
-        throw new Error(prefix + '.Adapter: Expected function, Actual: ' + babelHelpers.typeof(options.Adapter));
+        throw new Error(prefix + '.Adapter: Expected function, Actual: ' + _typeof(options.Adapter));
       }
       beforeEach(function () {
         this.$$adapter = new options.Adapter(options.adapterConfig);
@@ -4669,7 +4666,7 @@
         }
       });
 
-      afterEach(babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      afterEach(asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var Test, toClear, promise;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {

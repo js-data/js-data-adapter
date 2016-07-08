@@ -4,14 +4,13 @@
   (factory((global.Adapter = global.Adapter || {}),global.JSData));
 }(this, function (exports,jsData) { 'use strict';
 
-  var babelHelpers = {};
-  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
     return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
-  babelHelpers.defineProperty = function (obj, key, value) {
+  var defineProperty = function (obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -26,7 +25,7 @@
     return obj;
   };
 
-  babelHelpers.slicedToArray = function () {
+  var slicedToArray = function () {
     function sliceIterator(arr, i) {
       var _arr = [];
       var _n = true;
@@ -64,29 +63,23 @@
     };
   }();
 
-  babelHelpers;
-
   var noop = function noop() {
-    var self = this;
-
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
     var opts = args[args.length - 1];
-    self.dbg.apply(self, [opts.op].concat(args));
+    this.dbg.apply(this, [opts.op].concat(args));
     return jsData.utils.resolve();
   };
 
   var noop2 = function noop2() {
-    var self = this;
-
     for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       args[_key2] = arguments[_key2];
     }
 
     var opts = args[args.length - 2];
-    self.dbg.apply(self, [opts.op].concat(args));
+    this.dbg.apply(this, [opts.op].concat(args));
     return jsData.utils.resolve();
   };
 
@@ -113,6 +106,36 @@
     return jsData.utils.omit(props, toStrip);
   };
 
+  var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
+
+  /**
+   * Response object used when `raw` is `true`. May contain other fields in
+   * addition to `data`.
+   *
+   * @class Response
+   */
+  function Response(data, meta, op) {
+    meta || (meta = {});
+
+    /**
+     * Response data.
+     *
+     * @name Response#data
+     * @type {*}
+     */
+    this.data = data;
+
+    jsData.utils.fillIn(this, meta);
+
+    /**
+     * The operation for which the response was created.
+     *
+     * @name Response#op
+     * @type {string}
+     */
+    this.op = op;
+  }
+
   var DEFAULTS = {
     /**
      * Whether to log debugging information.
@@ -138,63 +161,23 @@
    *
    * @class Adapter
    * @abstract
+   * @extends Component
    * @param {Object} [opts] Configuration opts.
    * @param {boolean} [opts.debug=false] Whether to log debugging information.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed response
    * object.
    */
   function Adapter(opts) {
-    var self = this;
+    jsData.utils.classCallCheck(this, Adapter);
+    jsData.Component.call(this);
     opts || (opts = {});
     jsData.utils.fillIn(opts, DEFAULTS);
-    jsData.utils.fillIn(self, opts);
+    jsData.utils.fillIn(this, opts);
   }
 
-  var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
+  jsData.Component.extend({
+    constructor: Adapter,
 
-  /**
-   * Response object used when `raw` is `true`. May contain other fields in
-   * addition to `data`.
-   *
-   * @class Response
-   */
-  function Response(data, meta, op) {
-    var self = this;
-    meta || (meta = {});
-
-    /**
-     * Response data.
-     *
-     * @name Response#data
-     * @type {*}
-     */
-    self.data = data;
-
-    jsData.utils.fillIn(self, meta);
-
-    /**
-     * The operation for which the response was created.
-     *
-     * @name Response#op
-     * @type {string}
-     */
-    self.op = op;
-  }
-
-  /**
-   * Alternative to ES6 class syntax for extending `Adapter`.
-   *
-   * @name Adapter.extend
-   * @method
-   * @param {Object} [instanceProps] Properties that will be added to the
-   * prototype of the subclass.
-   * @param {Object} [classProps] Properties that will be added as static
-   * properties to the subclass itself.
-   * @return {Object} Subclass of `Adapter`.
-   */
-  Adapter.extend = jsData.utils.extend;
-
-  jsData.utils.addHiddenPropsToTarget(Adapter.prototype, {
     /**
      * Lifecycle method method called by <a href="#count__anchor">count</a>.
      *
@@ -662,21 +645,6 @@
     beforeUpdateMany: noop,
 
     /**
-     * Shortcut for `#log('debug'[, arg1[, arg2[, argn]]])`.
-     *
-     * @name Adapter#dbg
-     * @method
-     */
-    dbg: function dbg() {
-      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
-      }
-
-      this.log.apply(this, ['debug'].concat(args));
-    },
-
-
-    /**
      * Retrieve the number of records that match the selection query. Called by
      * `Mapper#count`.
      *
@@ -696,33 +664,33 @@
      * @return {Promise}
      */
     count: function count(mapper, query, opts) {
-      var self = this;
+      var _this = this;
+
       var op = void 0;
       query || (query = {});
       opts || (opts = {});
 
       // beforeCount lifecycle hook
       op = opts.op = 'beforeCount';
-      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
+      return jsData.utils.resolve(this[op](mapper, query, opts)).then(function () {
         // Allow for re-assignment from lifecycle hook
         op = opts.op = 'count';
-        self.dbg(op, mapper, query, opts);
-        return jsData.utils.resolve(self._count(mapper, query, opts));
+        _this.dbg(op, mapper, query, opts);
+        return jsData.utils.resolve(_this._count(mapper, query, opts));
       }).then(function (results) {
-        var _results = babelHelpers.slicedToArray(results, 2);
+        var _results = slicedToArray(results, 2);
 
         var data = _results[0];
         var result = _results[1];
 
         result || (result = {});
         var response = new Response(data, result, op);
-        response = self.respond(response, opts);
+        response = _this.respond(response, opts);
 
         // afterCount lifecycle hook
         op = opts.op = 'afterCount';
-        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this[op](mapper, query, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -741,22 +709,23 @@
      * @return {Promise}
      */
     create: function create(mapper, props, opts) {
-      var self = this;
+      var _this2 = this;
+
       var op = void 0;
       props || (props = {});
       opts || (opts = {});
 
       // beforeCreate lifecycle hook
       op = opts.op = 'beforeCreate';
-      return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
+      return jsData.utils.resolve(this[op](mapper, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = jsData.utils.isUndefined(_props) ? props : _props;
+        props = _props === undefined ? props : _props;
         props = withoutRelations(mapper, props, opts);
         op = opts.op = 'create';
-        self.dbg(op, mapper, props, opts);
-        return jsData.utils.resolve(self._create(mapper, props, opts));
+        _this2.dbg(op, mapper, props, opts);
+        return jsData.utils.resolve(_this2._create(mapper, props, opts));
       }).then(function (results) {
-        var _results2 = babelHelpers.slicedToArray(results, 2);
+        var _results2 = slicedToArray(results, 2);
 
         var data = _results2[0];
         var result = _results2[1];
@@ -764,13 +733,12 @@
         result || (result = {});
         var response = new Response(data, result, 'create');
         response.created = data ? 1 : 0;
-        response = self.respond(response, opts);
+        response = _this2.respond(response, opts);
 
         // afterCreate lifecycle hook
         op = opts.op = 'afterCreate';
-        return jsData.utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this2[op](mapper, props, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -789,24 +757,25 @@
      * @return {Promise}
      */
     createMany: function createMany(mapper, props, opts) {
-      var self = this;
+      var _this3 = this;
+
       var op = void 0;
       props || (props = {});
       opts || (opts = {});
 
       // beforeCreateMany lifecycle hook
       op = opts.op = 'beforeCreateMany';
-      return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
+      return jsData.utils.resolve(this[op](mapper, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = jsData.utils.isUndefined(_props) ? props : _props;
+        props = _props === undefined ? props : _props;
         props = props.map(function (record) {
           return withoutRelations(mapper, record, opts);
         });
         op = opts.op = 'createMany';
-        self.dbg(op, mapper, props, opts);
-        return jsData.utils.resolve(self._createMany(mapper, props, opts));
+        _this3.dbg(op, mapper, props, opts);
+        return jsData.utils.resolve(_this3._createMany(mapper, props, opts));
       }).then(function (results) {
-        var _results3 = babelHelpers.slicedToArray(results, 2);
+        var _results3 = slicedToArray(results, 2);
 
         var data = _results3[0];
         var result = _results3[1];
@@ -815,13 +784,12 @@
         result || (result = {});
         var response = new Response(data, result, 'createMany');
         response.created = data.length;
-        response = self.respond(response, opts);
+        response = _this3.respond(response, opts);
 
         // afterCreateMany lifecycle hook
         op = opts.op = 'afterCreateMany';
-        return jsData.utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this3[op](mapper, props, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -841,31 +809,31 @@
      * @return {Promise}
      */
     destroy: function destroy(mapper, id, opts) {
-      var self = this;
+      var _this4 = this;
+
       var op = void 0;
       opts || (opts = {});
 
       // beforeDestroy lifecycle hook
       op = opts.op = 'beforeDestroy';
-      return jsData.utils.resolve(self[op](mapper, id, opts)).then(function () {
+      return jsData.utils.resolve(this[op](mapper, id, opts)).then(function () {
         op = opts.op = 'destroy';
-        self.dbg(op, mapper, id, opts);
-        return jsData.utils.resolve(self._destroy(mapper, id, opts));
+        _this4.dbg(op, mapper, id, opts);
+        return jsData.utils.resolve(_this4._destroy(mapper, id, opts));
       }).then(function (results) {
-        var _results4 = babelHelpers.slicedToArray(results, 2);
+        var _results4 = slicedToArray(results, 2);
 
         var data = _results4[0];
         var result = _results4[1];
 
         result || (result = {});
         var response = new Response(data, result, 'destroy');
-        response = self.respond(response, opts);
+        response = _this4.respond(response, opts);
 
         // afterDestroy lifecycle hook
         op = opts.op = 'afterDestroy';
-        return jsData.utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this4[op](mapper, id, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -891,32 +859,32 @@
      * @return {Promise}
      */
     destroyAll: function destroyAll(mapper, query, opts) {
-      var self = this;
+      var _this5 = this;
+
       var op = void 0;
       query || (query = {});
       opts || (opts = {});
 
       // beforeDestroyAll lifecycle hook
       op = opts.op = 'beforeDestroyAll';
-      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
+      return jsData.utils.resolve(this[op](mapper, query, opts)).then(function () {
         op = opts.op = 'destroyAll';
-        self.dbg(op, mapper, query, opts);
-        return jsData.utils.resolve(self._destroyAll(mapper, query, opts));
+        _this5.dbg(op, mapper, query, opts);
+        return jsData.utils.resolve(_this5._destroyAll(mapper, query, opts));
       }).then(function (results) {
-        var _results5 = babelHelpers.slicedToArray(results, 2);
+        var _results5 = slicedToArray(results, 2);
 
         var data = _results5[0];
         var result = _results5[1];
 
         result || (result = {});
         var response = new Response(data, result, 'destroyAll');
-        response = self.respond(response, opts);
+        response = _this5.respond(response, opts);
 
         // afterDestroyAll lifecycle hook
         op = opts.op = 'afterDestroyAll';
-        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this5[op](mapper, query, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -932,28 +900,29 @@
      * @return {Promise}
      */
     loadBelongsTo: function loadBelongsTo(mapper, def, records, __opts) {
-      var self = this;
+      var _this6 = this;
+
       var relationDef = def.getRelation();
 
       if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
         var _ret = function () {
           var record = records;
           return {
-            v: self.find(relationDef, self.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
+            v: _this6.find(relationDef, _this6.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
               def.setLocalField(record, relatedItem);
             })
           };
         }();
 
-        if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
       } else {
         var keys = records.map(function (record) {
-          return self.makeBelongsToForeignKey(mapper, def, record);
+          return _this6.makeBelongsToForeignKey(mapper, def, record);
         }).filter(function (key) {
           return key;
         });
-        return self.findAll(relationDef, {
-          where: babelHelpers.defineProperty({}, relationDef.idAttribute, {
+        return this.findAll(relationDef, {
+          where: defineProperty({}, relationDef.idAttribute, {
             'in': keys
           })
         }, __opts).then(function (relatedItems) {
@@ -983,7 +952,8 @@
      * @return {Promise}
      */
     find: function find(mapper, id, opts) {
-      var self = this;
+      var _this7 = this;
+
       var record = void 0,
           op = void 0;
       opts || (opts = {});
@@ -991,12 +961,12 @@
 
       // beforeFind lifecycle hook
       op = opts.op = 'beforeFind';
-      return jsData.utils.resolve(self[op](mapper, id, opts)).then(function () {
+      return jsData.utils.resolve(this[op](mapper, id, opts)).then(function () {
         op = opts.op = 'find';
-        self.dbg(op, mapper, id, opts);
-        return jsData.utils.resolve(self._find(mapper, id, opts));
+        _this7.dbg(op, mapper, id, opts);
+        return jsData.utils.resolve(_this7._find(mapper, id, opts));
       }).then(function (results) {
-        var _results6 = babelHelpers.slicedToArray(results, 1);
+        var _results6 = slicedToArray(results, 1);
 
         var _record = _results6[0];
 
@@ -1010,33 +980,32 @@
           var task = void 0;
           if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
             if (def.type === 'hasOne') {
-              task = self.loadHasOne(mapper, def, record, __opts);
+              task = _this7.loadHasOne(mapper, def, record, __opts);
             } else {
-              task = self.loadHasMany(mapper, def, record, __opts);
+              task = _this7.loadHasMany(mapper, def, record, __opts);
             }
           } else if (def.type === 'hasMany' && def.localKeys) {
-            task = self.loadHasManyLocalKeys(mapper, def, record, __opts);
+            task = _this7.loadHasManyLocalKeys(mapper, def, record, __opts);
           } else if (def.type === 'hasMany' && def.foreignKeys) {
-            task = self.loadHasManyForeignKeys(mapper, def, record, __opts);
+            task = _this7.loadHasManyForeignKeys(mapper, def, record, __opts);
           } else if (def.type === 'belongsTo') {
-            task = self.loadBelongsTo(mapper, def, record, __opts);
+            task = _this7.loadBelongsTo(mapper, def, record, __opts);
           }
           if (task) {
             tasks.push(task);
           }
         });
 
-        return Promise.all(tasks);
+        return jsData.utils.Promise.all(tasks);
       }).then(function () {
         var response = new Response(record, {}, 'find');
         response.found = record ? 1 : 0;
-        response = self.respond(response, opts);
+        response = _this7.respond(response, opts);
 
         // afterFind lifecycle hook
         op = opts.op = 'afterFind';
-        return jsData.utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this7[op](mapper, id, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -1062,7 +1031,8 @@
      * @return {Promise}
      */
     findAll: function findAll(mapper, query, opts) {
-      var self = this;
+      var _this8 = this;
+
       opts || (opts = {});
       opts.with || (opts.with = []);
 
@@ -1081,12 +1051,12 @@
 
       // beforeFindAll lifecycle hook
       op = opts.op = 'beforeFindAll';
-      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
+      return jsData.utils.resolve(this[op](mapper, query, opts)).then(function () {
         op = opts.op = 'findAll';
-        self.dbg(op, mapper, query, opts);
-        return jsData.utils.resolve(self._findAll(mapper, query, opts));
+        _this8.dbg(op, mapper, query, opts);
+        return jsData.utils.resolve(_this8._findAll(mapper, query, opts));
       }).then(function (results) {
-        var _results7 = babelHelpers.slicedToArray(results, 1);
+        var _results7 = slicedToArray(results, 1);
 
         var _records = _results7[0];
 
@@ -1097,32 +1067,31 @@
           var task = void 0;
           if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
             if (def.type === 'hasMany') {
-              task = self.loadHasMany(mapper, def, records, __opts);
+              task = _this8.loadHasMany(mapper, def, records, __opts);
             } else {
-              task = self.loadHasOne(mapper, def, records, __opts);
+              task = _this8.loadHasOne(mapper, def, records, __opts);
             }
           } else if (def.type === 'hasMany' && def.localKeys) {
-            task = self.loadHasManyLocalKeys(mapper, def, records, __opts);
+            task = _this8.loadHasManyLocalKeys(mapper, def, records, __opts);
           } else if (def.type === 'hasMany' && def.foreignKeys) {
-            task = self.loadHasManyForeignKeys(mapper, def, records, __opts);
+            task = _this8.loadHasManyForeignKeys(mapper, def, records, __opts);
           } else if (def.type === 'belongsTo') {
-            task = self.loadBelongsTo(mapper, def, records, __opts);
+            task = _this8.loadBelongsTo(mapper, def, records, __opts);
           }
           if (task) {
             tasks.push(task);
           }
         });
-        return Promise.all(tasks);
+        return jsData.utils.Promise.all(tasks);
       }).then(function () {
         var response = new Response(records, {}, 'findAll');
         response.found = records.length;
-        response = self.respond(response, opts);
+        response = _this8.respond(response, opts);
 
         // afterFindAll lifecycle hook
         op = opts.op = 'afterFindAll';
-        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this8[op](mapper, query, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -1140,7 +1109,7 @@
      */
     getOpt: function getOpt(opt, opts) {
       opts || (opts = {});
-      return jsData.utils.isUndefined(opts[opt]) ? jsData.utils.plainCopy(this[opt]) : jsData.utils.plainCopy(opts[opt]);
+      return opts[opt] === undefined ? jsData.utils.plainCopy(this[opt]) : jsData.utils.plainCopy(opts[opt]);
     },
 
 
@@ -1154,7 +1123,8 @@
      * @return {Promise}
      */
     loadHasMany: function loadHasMany(mapper, def, records, __opts) {
-      var self = this;
+      var _this9 = this;
+
       var singular = false;
 
       if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
@@ -1162,7 +1132,7 @@
         records = [records];
       }
       var IDs = records.map(function (record) {
-        return self.makeHasManyForeignKey(mapper, def, record);
+        return _this9.makeHasManyForeignKey(mapper, def, record);
       });
       var query = {
         where: {}
@@ -1176,7 +1146,7 @@
           return id;
         });
       }
-      return self.findAll(def.getRelation(), query, __opts).then(function (relatedItems) {
+      return this.findAll(def.getRelation(), query, __opts).then(function (relatedItems) {
         records.forEach(function (record) {
           var attached = [];
           // avoid unneccesary iteration when we only have one record
@@ -1194,7 +1164,8 @@
       });
     },
     loadHasManyLocalKeys: function loadHasManyLocalKeys(mapper, def, records, __opts) {
-      var self = this;
+      var _this10 = this;
+
       var record = void 0;
       var relatedMapper = def.getRelation();
 
@@ -1203,9 +1174,9 @@
       }
 
       if (record) {
-        return self.findAll(relatedMapper, {
-          where: babelHelpers.defineProperty({}, relatedMapper.idAttribute, {
-            'in': self.makeHasManyLocalKeys(mapper, def, record)
+        return this.findAll(relatedMapper, {
+          where: defineProperty({}, relatedMapper.idAttribute, {
+            'in': this.makeHasManyLocalKeys(mapper, def, record)
           })
         }, __opts).then(function (relatedItems) {
           def.setLocalField(record, relatedItems);
@@ -1214,11 +1185,11 @@
         var _ret2 = function () {
           var localKeys = [];
           records.forEach(function (record) {
-            localKeys = localKeys.concat(self.self.makeHasManyLocalKeys(mapper, def, record));
+            localKeys = localKeys.concat(_this10.makeHasManyLocalKeys(mapper, def, record));
           });
           return {
-            v: self.findAll(relatedMapper, {
-              where: babelHelpers.defineProperty({}, relatedMapper.idAttribute, {
+            v: _this10.findAll(relatedMapper, {
+              where: defineProperty({}, relatedMapper.idAttribute, {
                 'in': unique(localKeys).filter(function (x) {
                   return x;
                 })
@@ -1240,11 +1211,12 @@
           };
         }();
 
-        if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
+        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
       }
     },
     loadHasManyForeignKeys: function loadHasManyForeignKeys(mapper, def, records, __opts) {
-      var self = this;
+      var _this11 = this;
+
       var relatedMapper = def.getRelation();
       var idAttribute = mapper.idAttribute;
       var record = void 0;
@@ -1254,18 +1226,18 @@
       }
 
       if (record) {
-        return self.findAll(def.getRelation(), {
-          where: babelHelpers.defineProperty({}, def.foreignKeys, {
-            'contains': self.makeHasManyForeignKeys(mapper, def, record)
+        return this.findAll(def.getRelation(), {
+          where: defineProperty({}, def.foreignKeys, {
+            'contains': this.makeHasManyForeignKeys(mapper, def, record)
           })
         }, __opts).then(function (relatedItems) {
           def.setLocalField(record, relatedItems);
         });
       } else {
-        return self.findAll(relatedMapper, {
-          where: babelHelpers.defineProperty({}, def.foreignKeys, {
+        return this.findAll(relatedMapper, {
+          where: defineProperty({}, def.foreignKeys, {
             'isectNotEmpty': records.map(function (record) {
-              return self.makeHasManyForeignKeys(mapper, def, record);
+              return _this11.makeHasManyForeignKeys(mapper, def, record);
             })
           })
         }, __opts).then(function (relatedItems) {
@@ -1307,40 +1279,6 @@
           }
         });
       });
-    },
-
-
-    /**
-     * Logging utility method. Override this method if you want to send log
-     * messages to something other than the console.
-     *
-     * @name Adapter#log
-     * @method
-     * @param {string} level Log level.
-     * @param {...*} values Values to log.
-     */
-    log: function log(level) {
-      for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        args[_key4 - 1] = arguments[_key4];
-      }
-
-      if (level && !args.length) {
-        args.push(level);
-        level = 'debug';
-      }
-      if (level === 'debug' && !this.debug) {
-        return;
-      }
-      var prefix = level.toUpperCase() + ': (Adapter)';
-      if (console[level]) {
-        var _console;
-
-        (_console = console)[level].apply(_console, [prefix].concat(args));
-      } else {
-        var _console2;
-
-        (_console2 = console).log.apply(_console2, [prefix].concat(args));
-      }
     },
 
 
@@ -1430,7 +1368,8 @@
      * @return {Promise}
      */
     sum: function sum(mapper, field, query, opts) {
-      var self = this;
+      var _this12 = this;
+
       var op = void 0;
       if (!jsData.utils.isString(field)) {
         throw new Error('field must be a string!');
@@ -1440,26 +1379,25 @@
 
       // beforeSum lifecycle hook
       op = opts.op = 'beforeSum';
-      return jsData.utils.resolve(self[op](mapper, field, query, opts)).then(function () {
+      return jsData.utils.resolve(this[op](mapper, field, query, opts)).then(function () {
         // Allow for re-assignment from lifecycle hook
         op = opts.op = 'sum';
-        self.dbg(op, mapper, field, query, opts);
-        return jsData.utils.resolve(self._sum(mapper, field, query, opts));
+        _this12.dbg(op, mapper, field, query, opts);
+        return jsData.utils.resolve(_this12._sum(mapper, field, query, opts));
       }).then(function (results) {
-        var _results8 = babelHelpers.slicedToArray(results, 2);
+        var _results8 = slicedToArray(results, 2);
 
         var data = _results8[0];
         var result = _results8[1];
 
         result || (result = {});
         var response = new Response(data, result, op);
-        response = self.respond(response, opts);
+        response = _this12.respond(response, opts);
 
         // afterSum lifecycle hook
         op = opts.op = 'afterSum';
-        return jsData.utils.resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this12[op](mapper, field, query, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -1493,22 +1431,23 @@
      * @return {Promise}
      */
     update: function update(mapper, id, props, opts) {
-      var self = this;
+      var _this13 = this;
+
       props || (props = {});
       opts || (opts = {});
       var op = void 0;
 
       // beforeUpdate lifecycle hook
       op = opts.op = 'beforeUpdate';
-      return jsData.utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
+      return jsData.utils.resolve(this[op](mapper, id, props, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = jsData.utils.isUndefined(_props) ? props : _props;
+        props = _props === undefined ? props : _props;
         props = withoutRelations(mapper, props, opts);
         op = opts.op = 'update';
-        self.dbg(op, mapper, id, props, opts);
-        return jsData.utils.resolve(self._update(mapper, id, props, opts));
+        _this13.dbg(op, mapper, id, props, opts);
+        return jsData.utils.resolve(_this13._update(mapper, id, props, opts));
       }).then(function (results) {
-        var _results9 = babelHelpers.slicedToArray(results, 2);
+        var _results9 = slicedToArray(results, 2);
 
         var data = _results9[0];
         var result = _results9[1];
@@ -1516,13 +1455,12 @@
         result || (result = {});
         var response = new Response(data, result, 'update');
         response.updated = data ? 1 : 0;
-        response = self.respond(response, opts);
+        response = _this13.respond(response, opts);
 
         // afterUpdate lifecycle hook
         op = opts.op = 'afterUpdate';
-        return jsData.utils.resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this13[op](mapper, id, props, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -1549,7 +1487,8 @@
      * @return {Promise}
      */
     updateAll: function updateAll(mapper, props, query, opts) {
-      var self = this;
+      var _this14 = this;
+
       props || (props = {});
       query || (query = {});
       opts || (opts = {});
@@ -1557,15 +1496,15 @@
 
       // beforeUpdateAll lifecycle hook
       op = opts.op = 'beforeUpdateAll';
-      return jsData.utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
+      return jsData.utils.resolve(this[op](mapper, props, query, opts)).then(function (_props) {
         // Allow for re-assignment from lifecycle hook
-        props = jsData.utils.isUndefined(_props) ? props : _props;
+        props = _props === undefined ? props : _props;
         props = withoutRelations(mapper, props, opts);
         op = opts.op = 'updateAll';
-        self.dbg(op, mapper, props, query, opts);
-        return jsData.utils.resolve(self._updateAll(mapper, props, query, opts));
+        _this14.dbg(op, mapper, props, query, opts);
+        return jsData.utils.resolve(_this14._updateAll(mapper, props, query, opts));
       }).then(function (results) {
-        var _results10 = babelHelpers.slicedToArray(results, 2);
+        var _results10 = slicedToArray(results, 2);
 
         var data = _results10[0];
         var result = _results10[1];
@@ -1574,13 +1513,12 @@
         result || (result = {});
         var response = new Response(data, result, 'updateAll');
         response.updated = data.length;
-        response = self.respond(response, opts);
+        response = _this14.respond(response, opts);
 
         // afterUpdateAll lifecycle hook
         op = opts.op = 'afterUpdateAll';
-        return jsData.utils.resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this14[op](mapper, props, query, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     },
@@ -1599,7 +1537,8 @@
      * @return {Promise}
      */
     updateMany: function updateMany(mapper, records, opts) {
-      var self = this;
+      var _this15 = this;
+
       records || (records = []);
       opts || (opts = {});
       var op = void 0;
@@ -1611,17 +1550,17 @@
 
       // beforeUpdateMany lifecycle hook
       op = opts.op = 'beforeUpdateMany';
-      return jsData.utils.resolve(self[op](mapper, records, opts)).then(function (_records) {
+      return jsData.utils.resolve(this[op](mapper, records, opts)).then(function (_records) {
         // Allow for re-assignment from lifecycle hook
-        records = jsData.utils.isUndefined(_records) ? records : _records;
+        records = _records === undefined ? records : _records;
         records = records.map(function (record) {
           return withoutRelations(mapper, record, opts);
         });
         op = opts.op = 'updateMany';
-        self.dbg(op, mapper, records, opts);
-        return jsData.utils.resolve(self._updateMany(mapper, records, opts));
+        _this15.dbg(op, mapper, records, opts);
+        return jsData.utils.resolve(_this15._updateMany(mapper, records, opts));
       }).then(function (results) {
-        var _results11 = babelHelpers.slicedToArray(results, 2);
+        var _results11 = slicedToArray(results, 2);
 
         var data = _results11[0];
         var result = _results11[1];
@@ -1630,13 +1569,12 @@
         result || (result = {});
         var response = new Response(data, result, 'updateMany');
         response.updated = data.length;
-        response = self.respond(response, opts);
+        response = _this15.respond(response, opts);
 
         // afterUpdateMany lifecycle hook
         op = opts.op = 'afterUpdateMany';
-        return jsData.utils.resolve(self[op](mapper, records, opts, response)).then(function (_response) {
-          // Allow for re-assignment from lifecycle hook
-          return jsData.utils.isUndefined(_response) ? response : _response;
+        return jsData.utils.resolve(_this15[op](mapper, records, opts, response)).then(function (_response) {
+          return _response === undefined ? response : _response;
         });
       });
     }
@@ -1646,9 +1584,11 @@
   exports.noop2 = noop2;
   exports.unique = unique;
   exports.withoutRelations = withoutRelations;
-  exports.Adapter = Adapter;
   exports.reserved = reserved;
   exports.Response = Response;
+  exports.Adapter = Adapter;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 //# sourceMappingURL=js-data-adapter.js.map
