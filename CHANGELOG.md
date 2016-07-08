@@ -1,3 +1,8 @@
+##### 0.7.4 - 07 July 2016
+
+###### Backwards compatible changes
+- Updated dependencies
+
 ##### 0.7.3 - 25 May 2016
 
 ###### Bug fixes

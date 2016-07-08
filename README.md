@@ -16,8 +16,7 @@ Refer to the various JSData adapter repositories to see how they extend `Adapter
 
 ##### Browser-based adapter
 ```
-npm i --save js-data
-npm i --save-dev js-data-adapter
+npm i --save js-data js-data-adapter
 ```
 
 ##### Node.js based adapter
@@ -65,7 +64,6 @@ Object.defineProperty(MyAdapter, '__super__', {
 
 ## Links
 
-* [JSData Quick start](http://www.js-data.io/v3.0/docs/home#quick-start) - Get started in 5 minutes
 * [Guides and Tutorials](http://www.js-data.io/v3.0/docs/home) - Learn how to use JSData
 * [API Reference Docs](http://api.js-data.io) - Explore components, methods, options, etc.
 * [Community & Support](http://js-data.io/docs/community) - Find solutions and chat with the community
