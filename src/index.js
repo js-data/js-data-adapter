@@ -847,6 +847,7 @@ Component.extend({
    */
   find (mapper, id, opts) {
     let record, op
+    let meta = {}
     opts || (opts = {})
     opts.with || (opts.with = [])
 
@@ -859,11 +860,12 @@ Component.extend({
         return utils.resolve(this._find(mapper, id, opts))
       })
       .then((results) => {
-        let [_record] = results
+        let [_record, _meta] = results
         if (!_record) {
           return
         }
         record = _record
+        meta = _meta
         const tasks = []
 
         utils.forEachRelation(mapper, opts, (def, __opts) => {
@@ -889,7 +891,7 @@ Component.extend({
         return utils.Promise.all(tasks)
       })
       .then(() => {
-        let response = new Response(record, {}, 'find')
+        let response = new Response(record, meta, 'find')
         response.found = record ? 1 : 0
         response = this.respond(response, opts)
 
@@ -924,6 +926,7 @@ Component.extend({
     opts.with || (opts.with = [])
 
     let records = []
+    let meta = {}
     let op
     const activeWith = opts._activeWith
 
@@ -945,9 +948,10 @@ Component.extend({
         return utils.resolve(this._findAll(mapper, query, opts))
       })
       .then((results) => {
-        let [_records] = results
+        let [_records, _meta] = results
         _records || (_records = [])
         records = _records
+        meta = _meta
         const tasks = []
         utils.forEachRelation(mapper, opts, (def, __opts) => {
           let task
@@ -971,7 +975,7 @@ Component.extend({
         return utils.Promise.all(tasks)
       })
       .then(() => {
-        let response = new Response(records, {}, 'findAll')
+        let response = new Response(records, meta, 'findAll')
         response.found = records.length
         response = this.respond(response, opts)
 
