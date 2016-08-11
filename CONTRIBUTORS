@@ -1,5 +1,7 @@
-# People who have contributed to the js-data-adapter project.
+# This is the official list of js-data-adapter project contributors.
 #
-# Names should be added to this file as:
-#   [commit count] Name <email address>
-    1  Jason Dobry <jason.dobry@gmail.com>
+# Names are formatted as:
+#   Name [email address]
+#
+Jason Dobry <jason.dobry@gmail.com>
+Nick Escallon <nickescallon@gmail.com>

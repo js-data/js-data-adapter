@@ -1,3 +1,14 @@
+##### 0.8.0 - 10 August 2016
+
+###### Breaking changes
+- Requiring latest rc of js-data
+
+###### Backwards compatible changes
+- Updated dependencies
+
+###### Bug fixes
+- #4, #5 response metadata not getting passed to findAll by @nickescallon
+
 ##### 0.7.4 - 07 July 2016
 
 ###### Backwards compatible changes

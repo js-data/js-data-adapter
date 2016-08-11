@@ -3,3 +3,4 @@ typings
 node_modules
 coverage
 doc
+*.log

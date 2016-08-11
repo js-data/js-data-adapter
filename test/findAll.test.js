@@ -36,6 +36,31 @@ export default function (options) {
       assert.equal(users2[0].name, 'John', users2[0].name)
     })
 
+    it('should filter users with raw option', async function () {
+      let props = { name: 'John' }
+      assert.debug('findAll', User.name, { age: 30 })
+      const result = await adapter.findAll(User, { age: 30 }, { raw: true })
+      const users = result.data
+      assert.debug('found', User.name, users)
+      assert.equal(result.mock, true, 'should have metadata')
+      assert.equal(users.length, 0, 'users.length')
+
+      assert.debug('create', User.name, props)
+      const user = await adapter.create(User, props)
+      assert.debug('created', User.name, user)
+      const userId = user[User.idAttribute]
+
+      assert.debug('findAll', User.name, { name: 'John' })
+      const result2 = await adapter.findAll(User, { name: 'John' }, { raw: true })
+      const users2 = result2.data
+      assert.equal(result2.mock, true, 'should have metadata')
+      assert.debug('found', User.name, users2)
+
+      assert.equal(users2.length, 1, 'users2.length')
+      assert.equal(users2[0][User.idAttribute], userId, 'users2[0][User.idAttribute]')
+      assert.equal(users2[0].name, 'John', users2[0].name)
+    })
+
     if (options.hasFeature('findAllInOp')) {
       it('should filter users using the "in" operator', async function () {
         var users = await adapter.findAll(User, {
