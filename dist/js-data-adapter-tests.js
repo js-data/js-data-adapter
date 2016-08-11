@@ -2890,14 +2890,68 @@
         }, _callee, this);
       })));
 
+      it('should filter users with raw option', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        var props, result, users, user, userId, result2, users2;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                props = { name: 'John' };
+
+                assert.debug('findAll', User.name, { age: 30 });
+                _context2.next = 4;
+                return adapter.findAll(User, { age: 30 }, { raw: true });
+
+              case 4:
+                result = _context2.sent;
+                users = result.data;
+
+                assert.debug('found', User.name, users);
+                assert.equal(result.mock, true, 'should have metadata');
+                assert.equal(users.length, 0, 'users.length');
+
+                assert.debug('create', User.name, props);
+                _context2.next = 12;
+                return adapter.create(User, props);
+
+              case 12:
+                user = _context2.sent;
+
+                assert.debug('created', User.name, user);
+                userId = user[User.idAttribute];
+
+
+                assert.debug('findAll', User.name, { name: 'John' });
+                _context2.next = 18;
+                return adapter.findAll(User, { name: 'John' }, { raw: true });
+
+              case 18:
+                result2 = _context2.sent;
+                users2 = result2.data;
+
+                assert.equal(result2.mock, true, 'should have metadata');
+                assert.debug('found', User.name, users2);
+
+                assert.equal(users2.length, 1, 'users2.length');
+                assert.equal(users2[0][User.idAttribute], userId, 'users2[0][User.idAttribute]');
+                assert.equal(users2[0].name, 'John', users2[0].name);
+
+              case 25:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      })));
+
       if (options.hasFeature('findAllInOp')) {
-        it('should filter users using the "in" operator', asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        it('should filter users using the "in" operator', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
           var users, user, id, users2;
-          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
-              switch (_context2.prev = _context2.next) {
+              switch (_context3.prev = _context3.next) {
                 case 0:
-                  _context2.next = 2;
+                  _context3.next = 2;
                   return adapter.findAll(User, {
                     where: {
                       age: {
@@ -2907,21 +2961,21 @@
                   });
 
                 case 2:
-                  users = _context2.sent;
+                  users = _context3.sent;
 
                   assert.equal(users.length, 0, 'users.length');
 
-                  _context2.next = 6;
+                  _context3.next = 6;
                   return adapter.create(User, { name: 'John' });
 
                 case 6:
-                  user = _context2.sent;
+                  user = _context3.sent;
                   id = user[User.idAttribute];
-                  _context2.next = 10;
+                  _context3.next = 10;
                   return adapter.findAll(User, { name: 'John' });
 
                 case 10:
-                  users2 = _context2.sent;
+                  users2 = _context3.sent;
 
                   assert.equal(users2.length, 1, 'users2.length');
                   assert.equal(users2[0][User.idAttribute], id, 'users2[0][User.idAttribute]');
@@ -2929,21 +2983,21 @@
 
                 case 14:
                 case 'end':
-                  return _context2.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee2, this);
+          }, _callee3, this);
         })));
       }
 
       if (options.hasFeature('findAllLikeOp')) {
-        it('should filter users using the "like" operator', asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        it('should filter users using the "like" operator', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
           var users, user, id, users2;
-          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
-              switch (_context3.prev = _context3.next) {
+              switch (_context4.prev = _context4.next) {
                 case 0:
-                  _context3.next = 2;
+                  _context4.next = 2;
                   return adapter.findAll(User, {
                     where: {
                       name: {
@@ -2953,17 +3007,17 @@
                   });
 
                 case 2:
-                  users = _context3.sent;
+                  users = _context4.sent;
 
                   assert.equal(users.length, 0);
 
-                  _context3.next = 6;
+                  _context4.next = 6;
                   return adapter.create(User, { name: 'John' });
 
                 case 6:
-                  user = _context3.sent;
+                  user = _context4.sent;
                   id = user.id;
-                  _context3.next = 10;
+                  _context4.next = 10;
                   return adapter.findAll(User, {
                     where: {
                       name: {
@@ -2973,7 +3027,7 @@
                   });
 
                 case 10:
-                  users2 = _context3.sent;
+                  users2 = _context4.sent;
 
                   assert.equal(users2.length, 1);
                   assert.equal(users2[0].id, id);
@@ -2981,10 +3035,10 @@
 
                 case 14:
                 case 'end':
-                  return _context3.stop();
+                  return _context4.stop();
               }
             }
-          }, _callee3, this);
+          }, _callee4, this);
         })));
       }
 
@@ -3005,11 +3059,11 @@
       }
 
       if (options.hasFeature('findAllBelongsTo')) {
-        it('should load belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        it('should load belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
           var props, user, profile, post, comment, user2, post2, comment2, comments;
-          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
-              switch (_context4.prev = _context4.next) {
+              switch (_context5.prev = _context5.next) {
                 case 0:
                   this.toClear.push('Post');
                   this.toClear.push('Profile');
@@ -3017,80 +3071,80 @@
                   props = { name: 'John' };
 
                   assert.debug('create', User.name, props);
-                  _context4.next = 7;
+                  _context5.next = 7;
                   return adapter.create(User, props);
 
                 case 7:
-                  user = _context4.sent;
+                  user = _context5.sent;
 
                   assert.debug('created', User.name, user);
 
                   props = { email: 'foo@test.com', userId: user[User.idAttribute] };
                   assert.debug('create', Profile.name, props);
-                  _context4.next = 13;
+                  _context5.next = 13;
                   return adapter.create(Profile, props);
 
                 case 13:
-                  profile = _context4.sent;
+                  profile = _context5.sent;
 
                   assert.debug('created', Profile.name, profile);
 
                   props = { content: 'foo', userId: user[User.idAttribute] };
                   assert.debug('create', Post.name, props);
-                  _context4.next = 19;
+                  _context5.next = 19;
                   return adapter.create(Post, props);
 
                 case 19:
-                  post = _context4.sent;
+                  post = _context5.sent;
 
                   assert.debug('created', Post.name, post);
 
                   props = { content: 'test2', postId: post[Post.idAttribute], userId: post.userId };
                   assert.debug('create', Comment.name, props);
-                  _context4.next = 25;
+                  _context5.next = 25;
                   return adapter.create(Comment, props);
 
                 case 25:
-                  comment = _context4.sent;
+                  comment = _context5.sent;
 
                   assert.debug('created', Comment.name, comment);
 
                   props = { name: 'Sally' };
                   assert.debug('create', User.name, props);
-                  _context4.next = 31;
+                  _context5.next = 31;
                   return adapter.create(User, props);
 
                 case 31:
-                  user2 = _context4.sent;
+                  user2 = _context5.sent;
 
                   assert.debug('created', User.name, user2);
 
                   props = { content: 'bar', userId: user2[User.idAttribute] };
                   assert.debug('create', Post.name, props);
-                  _context4.next = 37;
+                  _context5.next = 37;
                   return adapter.create(Post, props);
 
                 case 37:
-                  post2 = _context4.sent;
+                  post2 = _context5.sent;
 
                   assert.debug('created', Post.name, post2);
 
                   props = { content: 'test67', postId: post2[Post.idAttribute], userId: post2.userId };
                   assert.debug('create', Comment.name, props);
-                  _context4.next = 43;
+                  _context5.next = 43;
                   return adapter.create(Comment, props);
 
                 case 43:
-                  comment2 = _context4.sent;
+                  comment2 = _context5.sent;
 
                   assert.debug('created', Comment.name, comment2);
 
                   assert.debug('findAll', Comment.name, {});
-                  _context4.next = 48;
+                  _context5.next = 48;
                   return adapter.findAll(Comment, {}, { 'with': ['user', 'post'] });
 
                 case 48:
-                  comments = _context4.sent;
+                  comments = _context5.sent;
 
                   assert.debug('found', Comment.name, comments);
 
@@ -3101,87 +3155,87 @@
 
                 case 54:
                 case 'end':
-                  return _context4.stop();
+                  return _context5.stop();
               }
             }
-          }, _callee4, this);
+          }, _callee5, this);
         })));
 
-        it('should load belongsTo relations and filter sub queries', asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        it('should load belongsTo relations and filter sub queries', asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
           var props, user, user2, post, post2, post3, post4, users;
-          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          return regeneratorRuntime.wrap(function _callee6$(_context6) {
             while (1) {
-              switch (_context5.prev = _context5.next) {
+              switch (_context6.prev = _context6.next) {
                 case 0:
                   this.toClear.push('Post');
                   this.toClear.push('Comment');
                   props = { name: 'John' };
 
                   assert.debug('create', User.name, props);
-                  _context5.next = 6;
+                  _context6.next = 6;
                   return adapter.create(User, props);
 
                 case 6:
-                  user = _context5.sent;
+                  user = _context6.sent;
 
                   assert.debug('created', User.name, user);
 
                   props = { name: 'Sally' };
                   assert.debug('create', User.name, props);
-                  _context5.next = 12;
+                  _context6.next = 12;
                   return adapter.create(User, props);
 
                 case 12:
-                  user2 = _context5.sent;
+                  user2 = _context6.sent;
 
                   assert.debug('created', User.name, user);
 
                   props = { status: 'draft', userId: user[User.idAttribute] };
                   assert.debug('create', Post.name, props);
-                  _context5.next = 18;
+                  _context6.next = 18;
                   return adapter.create(Post, props);
 
                 case 18:
-                  post = _context5.sent;
+                  post = _context6.sent;
 
                   assert.debug('created', Post.name, post);
 
                   props = { status: 'published', userId: user[User.idAttribute] };
                   assert.debug('create', Post.name, props);
-                  _context5.next = 24;
+                  _context6.next = 24;
                   return adapter.create(Post, props);
 
                 case 24:
-                  post2 = _context5.sent;
+                  post2 = _context6.sent;
 
                   assert.debug('created', Post.name, post2);
 
                   props = { status: 'draft', userId: user2[User.idAttribute] };
                   assert.debug('create', Post.name, props);
-                  _context5.next = 30;
+                  _context6.next = 30;
                   return adapter.create(Post, props);
 
                 case 30:
-                  post3 = _context5.sent;
+                  post3 = _context6.sent;
 
                   assert.debug('created', Post.name, post3);
 
                   props = { status: 'published', userId: user2[User.idAttribute] };
                   assert.debug('create', Post.name, props);
-                  _context5.next = 36;
+                  _context6.next = 36;
                   return adapter.create(Post, props);
 
                 case 36:
-                  post4 = _context5.sent;
+                  post4 = _context6.sent;
 
                   assert.debug('created', Post.name, post4);
 
                   assert.debug('findAll', User.name, defineProperty({}, User.idAttribute, user[User.idAttribute]));
-                  _context5.next = 41;
+                  _context6.next = 41;
                   return adapter.findAll(User, defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': ['post'] });
 
                 case 41:
-                  users = _context5.sent;
+                  users = _context6.sent;
 
                   assert.debug('found', User.name, users);
 
@@ -3190,7 +3244,7 @@
                   assert.equal(users[0].posts.length, 2, 'users[0].posts.length');
 
                   assert.debug('findAll', User.name, defineProperty({}, User.idAttribute, user[User.idAttribute]));
-                  _context5.next = 49;
+                  _context6.next = 49;
                   return adapter.findAll(User, defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': [{
                       relation: 'post',
                       query: {
@@ -3199,7 +3253,7 @@
                     }] });
 
                 case 49:
-                  users = _context5.sent;
+                  users = _context6.sent;
 
                   assert.debug('found', User.name, users);
 
@@ -3208,7 +3262,7 @@
                   assert.equal(users[0].posts.length, 1, 'users[0].posts.length');
 
                   assert.debug('findAll', User.name, defineProperty({}, User.idAttribute, user[User.idAttribute]));
-                  _context5.next = 57;
+                  _context6.next = 57;
                   return adapter.findAll(User, defineProperty({}, User.idAttribute, user[User.idAttribute]), { 'with': [{
                       relation: 'post',
                       replace: true,
@@ -3218,7 +3272,7 @@
                     }] });
 
                 case 57:
-                  users = _context5.sent;
+                  users = _context6.sent;
 
                   assert.debug('found', User.name, users);
 
@@ -3228,113 +3282,6 @@
 
                 case 62:
                 case 'end':
-                  return _context5.stop();
-              }
-            }
-          }, _callee5, this);
-        })));
-      }
-
-      if (options.hasFeature('findAllBelongsToNested')) {
-        it('should load belongsTo relations (nested)', asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
-          var props, user, profile, post, comment, user2, post2, comment2, comments;
-          return regeneratorRuntime.wrap(function _callee6$(_context6) {
-            while (1) {
-              switch (_context6.prev = _context6.next) {
-                case 0:
-                  this.toClear.push('Post');
-                  this.toClear.push('Profile');
-                  this.toClear.push('Comment');
-                  props = { name: 'John' };
-
-                  assert.debug('create', User.name, props);
-                  _context6.next = 7;
-                  return adapter.create(User, props);
-
-                case 7:
-                  user = _context6.sent;
-
-                  assert.debug('created', User.name, user);
-
-                  props = { email: 'foo@test.com', userId: user[User.idAttribute] };
-                  assert.debug('create', Profile.name, props);
-                  _context6.next = 13;
-                  return adapter.create(Profile, props);
-
-                case 13:
-                  profile = _context6.sent;
-
-                  assert.debug('created', Profile.name, profile);
-
-                  props = { content: 'foo', userId: user[User.idAttribute] };
-                  assert.debug('create', Post.name, props);
-                  _context6.next = 19;
-                  return adapter.create(Post, props);
-
-                case 19:
-                  post = _context6.sent;
-
-                  assert.debug('created', Post.name, post);
-
-                  props = { content: 'test2', postId: post[Post.idAttribute], userId: post.userId };
-                  assert.debug('create', Comment.name, props);
-                  _context6.next = 25;
-                  return adapter.create(Comment, props);
-
-                case 25:
-                  comment = _context6.sent;
-
-                  assert.debug('created', Comment.name, comment);
-
-                  props = { name: 'Sally' };
-                  assert.debug('create', User.name, props);
-                  _context6.next = 31;
-                  return adapter.create(User, props);
-
-                case 31:
-                  user2 = _context6.sent;
-
-                  assert.debug('created', User.name, user2);
-
-                  props = { content: 'bar', userId: user2[User.idAttribute] };
-                  assert.debug('create', Post.name, props);
-                  _context6.next = 37;
-                  return adapter.create(Post, props);
-
-                case 37:
-                  post2 = _context6.sent;
-
-                  assert.debug('created', Post.name, post2);
-
-                  props = { content: 'test67', postId: post2[Post.idAttribute], userId: post2.userId };
-                  assert.debug('create', Comment.name, props);
-                  _context6.next = 43;
-                  return adapter.create(Comment, props);
-
-                case 43:
-                  comment2 = _context6.sent;
-
-                  assert.debug('created', Comment.name, comment2);
-
-                  assert.debug('findAll', Comment.name, {});
-                  _context6.next = 48;
-                  return adapter.findAll(Comment, {}, { 'with': ['user', 'user.profile', 'post', 'post.user'] });
-
-                case 48:
-                  comments = _context6.sent;
-
-                  assert.debug('found', Comment.name, comments);
-
-                  assert.isDefined(comments[0].post, 'comments[0].post');
-                  assert.isDefined(comments[0].post.user, 'comments[0].post.user');
-                  assert.isDefined(comments[0].user, 'comments[0].user');
-                  assert.isDefined(comments[0].user.profile || comments[1].user.profile, 'comments[0].user.profile || comments[1].user.profile');
-                  assert.isDefined(comments[1].post, 'comments[1].post');
-                  assert.isDefined(comments[1].post.user, 'comments[1].post.user');
-                  assert.isDefined(comments[1].user, 'comments[1].user');
-
-                case 57:
-                case 'end':
                   return _context6.stop();
               }
             }
@@ -3342,9 +3289,9 @@
         })));
       }
 
-      if (options.hasFeature('findAllBelongsToHasMany')) {
-        it('should load hasMany and belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-          var props, user, profile, post, comment, user2, post2, comment2, posts;
+      if (options.hasFeature('findAllBelongsToNested')) {
+        it('should load belongsTo relations (nested)', asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+          var props, user, profile, post, comment, user2, post2, comment2, comments;
           return regeneratorRuntime.wrap(function _callee7$(_context7) {
             while (1) {
               switch (_context7.prev = _context7.next) {
@@ -3423,21 +3370,24 @@
 
                   assert.debug('created', Comment.name, comment2);
 
-                  assert.debug('find', Post.name, {});
+                  assert.debug('findAll', Comment.name, {});
                   _context7.next = 48;
-                  return adapter.findAll(Post, {}, { 'with': ['user', 'comment'] });
+                  return adapter.findAll(Comment, {}, { 'with': ['user', 'user.profile', 'post', 'post.user'] });
 
                 case 48:
-                  posts = _context7.sent;
+                  comments = _context7.sent;
 
-                  assert.debug('found', Post.name, posts);
+                  assert.debug('found', Comment.name, comments);
 
-                  assert.isDefined(posts[0].comments, 'posts[0].comments');
-                  assert.isDefined(posts[0].user, 'posts[0].user');
-                  assert.isDefined(posts[1].comments, 'posts[1].comments');
-                  assert.isDefined(posts[1].user, 'posts[1].user');
+                  assert.isDefined(comments[0].post, 'comments[0].post');
+                  assert.isDefined(comments[0].post.user, 'comments[0].post.user');
+                  assert.isDefined(comments[0].user, 'comments[0].user');
+                  assert.isDefined(comments[0].user.profile || comments[1].user.profile, 'comments[0].user.profile || comments[1].user.profile');
+                  assert.isDefined(comments[1].post, 'comments[1].post');
+                  assert.isDefined(comments[1].post.user, 'comments[1].post.user');
+                  assert.isDefined(comments[1].user, 'comments[1].user');
 
-                case 54:
+                case 57:
                 case 'end':
                   return _context7.stop();
               }
@@ -3446,7 +3396,7 @@
         })));
       }
 
-      if (options.hasFeature('findAllBelongsToHasManyNested')) {
+      if (options.hasFeature('findAllBelongsToHasMany')) {
         it('should load hasMany and belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
           var props, user, profile, post, comment, user2, post2, comment2, posts;
           return regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -3529,10 +3479,114 @@
 
                   assert.debug('find', Post.name, {});
                   _context8.next = 48;
-                  return adapter.findAll(Post, {}, { 'with': ['user', 'comment', 'comment.user', 'comment.user.profile'] });
+                  return adapter.findAll(Post, {}, { 'with': ['user', 'comment'] });
 
                 case 48:
                   posts = _context8.sent;
+
+                  assert.debug('found', Post.name, posts);
+
+                  assert.isDefined(posts[0].comments, 'posts[0].comments');
+                  assert.isDefined(posts[0].user, 'posts[0].user');
+                  assert.isDefined(posts[1].comments, 'posts[1].comments');
+                  assert.isDefined(posts[1].user, 'posts[1].user');
+
+                case 54:
+                case 'end':
+                  return _context8.stop();
+              }
+            }
+          }, _callee8, this);
+        })));
+      }
+
+      if (options.hasFeature('findAllBelongsToHasManyNested')) {
+        it('should load hasMany and belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+          var props, user, profile, post, comment, user2, post2, comment2, posts;
+          return regeneratorRuntime.wrap(function _callee9$(_context9) {
+            while (1) {
+              switch (_context9.prev = _context9.next) {
+                case 0:
+                  this.toClear.push('Post');
+                  this.toClear.push('Profile');
+                  this.toClear.push('Comment');
+                  props = { name: 'John' };
+
+                  assert.debug('create', User.name, props);
+                  _context9.next = 7;
+                  return adapter.create(User, props);
+
+                case 7:
+                  user = _context9.sent;
+
+                  assert.debug('created', User.name, user);
+
+                  props = { email: 'foo@test.com', userId: user[User.idAttribute] };
+                  assert.debug('create', Profile.name, props);
+                  _context9.next = 13;
+                  return adapter.create(Profile, props);
+
+                case 13:
+                  profile = _context9.sent;
+
+                  assert.debug('created', Profile.name, profile);
+
+                  props = { content: 'foo', userId: user[User.idAttribute] };
+                  assert.debug('create', Post.name, props);
+                  _context9.next = 19;
+                  return adapter.create(Post, props);
+
+                case 19:
+                  post = _context9.sent;
+
+                  assert.debug('created', Post.name, post);
+
+                  props = { content: 'test2', postId: post[Post.idAttribute], userId: post.userId };
+                  assert.debug('create', Comment.name, props);
+                  _context9.next = 25;
+                  return adapter.create(Comment, props);
+
+                case 25:
+                  comment = _context9.sent;
+
+                  assert.debug('created', Comment.name, comment);
+
+                  props = { name: 'Sally' };
+                  assert.debug('create', User.name, props);
+                  _context9.next = 31;
+                  return adapter.create(User, props);
+
+                case 31:
+                  user2 = _context9.sent;
+
+                  assert.debug('created', User.name, user2);
+
+                  props = { content: 'bar', userId: user2[User.idAttribute] };
+                  assert.debug('create', Post.name, props);
+                  _context9.next = 37;
+                  return adapter.create(Post, props);
+
+                case 37:
+                  post2 = _context9.sent;
+
+                  assert.debug('created', Post.name, post2);
+
+                  props = { content: 'test67', postId: post2[Post.idAttribute], userId: post2.userId };
+                  assert.debug('create', Comment.name, props);
+                  _context9.next = 43;
+                  return adapter.create(Comment, props);
+
+                case 43:
+                  comment2 = _context9.sent;
+
+                  assert.debug('created', Comment.name, comment2);
+
+                  assert.debug('find', Post.name, {});
+                  _context9.next = 48;
+                  return adapter.findAll(Post, {}, { 'with': ['user', 'comment', 'comment.user', 'comment.user.profile'] });
+
+                case 48:
+                  posts = _context9.sent;
 
                   assert.debug('found', Post.name, posts);
 
@@ -3546,76 +3600,16 @@
 
                 case 57:
                 case 'end':
-                  return _context8.stop();
-              }
-            }
-          }, _callee8, this);
-        })));
-      }
-
-      if (options.hasFeature('filterOnRelations')) {
-        it('should filter using belongsTo relation', asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-          var profile1, user1, post1, user2, post2, users;
-          return regeneratorRuntime.wrap(function _callee9$(_context9) {
-            while (1) {
-              switch (_context9.prev = _context9.next) {
-                case 0:
-                  this.toClear.push('Post');
-                  this.toClear.push('Profile');
-                  this.toClear.push('Comment');
-                  _context9.next = 5;
-                  return adapter.create(Profile, { email: 'foo@test.com' });
-
-                case 5:
-                  profile1 = _context9.sent;
-                  _context9.next = 8;
-                  return adapter.create(User, { name: 'John', profileId: profile1.id });
-
-                case 8:
-                  user1 = _context9.sent;
-                  _context9.next = 11;
-                  return adapter.create(Post, { content: 'foo', userId: user1.id });
-
-                case 11:
-                  post1 = _context9.sent;
-                  _context9.next = 14;
-                  return adapter.create(Comment, { content: 'test1', postId: post1.id, userId: post1.userId });
-
-                case 14:
-                  _context9.next = 16;
-                  return adapter.create(User, { name: 'Sally' });
-
-                case 16:
-                  user2 = _context9.sent;
-                  _context9.next = 19;
-                  return adapter.create(Post, { content: 'bar', userId: user2.id });
-
-                case 19:
-                  post2 = _context9.sent;
-                  _context9.next = 22;
-                  return adapter.create(Comment, { content: 'test2', postId: post2.id, userId: post2.userId });
-
-                case 22:
-                  _context9.next = 24;
-                  return adapter.findAll(User, { 'profile.email': 'foo@test.com' });
-
-                case 24:
-                  users = _context9.sent;
-
-                  assert.equal(users.length, 1);
-                  assert.equal(users[0].profileId, profile1.id);
-                  assert.equal(users[0].name, 'John');
-
-                case 28:
-                case 'end':
                   return _context9.stop();
               }
             }
           }, _callee9, this);
         })));
+      }
 
-        it('should filter through multiple hasOne/belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
-          var profile1, user1, post1, profile2, user2, post2, comments;
+      if (options.hasFeature('filterOnRelations')) {
+        it('should filter using belongsTo relation', asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+          var profile1, user1, post1, user2, post2, users;
           return regeneratorRuntime.wrap(function _callee10$(_context10) {
             while (1) {
               switch (_context10.prev = _context10.next) {
@@ -3643,35 +3637,30 @@
 
                 case 14:
                   _context10.next = 16;
-                  return adapter.create(Profile, { email: 'bar@test.com' });
+                  return adapter.create(User, { name: 'Sally' });
 
                 case 16:
-                  profile2 = _context10.sent;
-                  _context10.next = 19;
-                  return adapter.create(User, { name: 'Sally', profileId: profile2.id });
-
-                case 19:
                   user2 = _context10.sent;
-                  _context10.next = 22;
+                  _context10.next = 19;
                   return adapter.create(Post, { content: 'bar', userId: user2.id });
 
-                case 22:
+                case 19:
                   post2 = _context10.sent;
-                  _context10.next = 25;
+                  _context10.next = 22;
                   return adapter.create(Comment, { content: 'test2', postId: post2.id, userId: post2.userId });
 
-                case 25:
-                  _context10.next = 27;
-                  return adapter.findAll(Comment, { 'user.profile.email': 'foo@test.com' });
+                case 22:
+                  _context10.next = 24;
+                  return adapter.findAll(User, { 'profile.email': 'foo@test.com' });
 
-                case 27:
-                  comments = _context10.sent;
+                case 24:
+                  users = _context10.sent;
 
-                  assert.equal(comments.length, 1);
-                  assert.equal(comments[0].userId, user1.id);
-                  assert.equal(comments[0].content, 'test1');
+                  assert.equal(users.length, 1);
+                  assert.equal(users[0].profileId, profile1.id);
+                  assert.equal(users[0].name, 'John');
 
-                case 31:
+                case 28:
                 case 'end':
                   return _context10.stop();
               }
@@ -3679,7 +3668,7 @@
           }, _callee10, this);
         })));
 
-        it('should filter using multiple hasOne/belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+        it('should filter through multiple hasOne/belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
           var profile1, user1, post1, profile2, user2, post2, comments;
           return regeneratorRuntime.wrap(function _callee11$(_context11) {
             while (1) {
@@ -3727,7 +3716,7 @@
 
                 case 25:
                   _context11.next = 27;
-                  return adapter.findAll(Comment, { 'user.name': 'John', 'user.profile.email': 'foo@test.com' });
+                  return adapter.findAll(Comment, { 'user.profile.email': 'foo@test.com' });
 
                 case 27:
                   comments = _context11.sent;
@@ -3743,37 +3732,102 @@
             }
           }, _callee11, this);
         })));
+
+        it('should filter using multiple hasOne/belongsTo relations', asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+          var profile1, user1, post1, profile2, user2, post2, comments;
+          return regeneratorRuntime.wrap(function _callee12$(_context12) {
+            while (1) {
+              switch (_context12.prev = _context12.next) {
+                case 0:
+                  this.toClear.push('Post');
+                  this.toClear.push('Profile');
+                  this.toClear.push('Comment');
+                  _context12.next = 5;
+                  return adapter.create(Profile, { email: 'foo@test.com' });
+
+                case 5:
+                  profile1 = _context12.sent;
+                  _context12.next = 8;
+                  return adapter.create(User, { name: 'John', profileId: profile1.id });
+
+                case 8:
+                  user1 = _context12.sent;
+                  _context12.next = 11;
+                  return adapter.create(Post, { content: 'foo', userId: user1.id });
+
+                case 11:
+                  post1 = _context12.sent;
+                  _context12.next = 14;
+                  return adapter.create(Comment, { content: 'test1', postId: post1.id, userId: post1.userId });
+
+                case 14:
+                  _context12.next = 16;
+                  return adapter.create(Profile, { email: 'bar@test.com' });
+
+                case 16:
+                  profile2 = _context12.sent;
+                  _context12.next = 19;
+                  return adapter.create(User, { name: 'Sally', profileId: profile2.id });
+
+                case 19:
+                  user2 = _context12.sent;
+                  _context12.next = 22;
+                  return adapter.create(Post, { content: 'bar', userId: user2.id });
+
+                case 22:
+                  post2 = _context12.sent;
+                  _context12.next = 25;
+                  return adapter.create(Comment, { content: 'test2', postId: post2.id, userId: post2.userId });
+
+                case 25:
+                  _context12.next = 27;
+                  return adapter.findAll(Comment, { 'user.name': 'John', 'user.profile.email': 'foo@test.com' });
+
+                case 27:
+                  comments = _context12.sent;
+
+                  assert.equal(comments.length, 1);
+                  assert.equal(comments[0].userId, user1.id);
+                  assert.equal(comments[0].content, 'test1');
+
+                case 31:
+                case 'end':
+                  return _context12.stop();
+              }
+            }
+          }, _callee12, this);
+        })));
       }
 
-      it('should allow passing limit and offset as strings', asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+      it('should allow passing limit and offset as strings', asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                _context12.next = 2;
+                _context13.next = 2;
                 return adapter.findAll(User, { limit: '10', offset: '20' });
 
               case 2:
               case 'end':
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee13, this);
       })));
 
       if (options.hasFeature('findAllGroupedWhere')) {
-        it('should support filtering grouped "where" clauses', asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
+        it('should support filtering grouped "where" clauses', asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
           var posts, query;
-          return regeneratorRuntime.wrap(function _callee13$(_context13) {
+          return regeneratorRuntime.wrap(function _callee14$(_context14) {
             while (1) {
-              switch (_context13.prev = _context13.next) {
+              switch (_context14.prev = _context14.next) {
                 case 0:
                   this.toClear.push('Post');
-                  _context13.next = 3;
+                  _context14.next = 3;
                   return adapter.createMany(Post, [{ status: 'draft', content: 'foo' }, { status: 'broken', content: 'bar' }, { status: 'published', content: 'hi' }, { status: 'flagged', content: 'hello world' }, { status: 'flagged', content: 'test' }]);
 
                 case 3:
-                  posts = _context13.sent;
+                  posts = _context14.sent;
                   query = {
                     where: [[{
                       content: {
@@ -3796,22 +3850,22 @@
                     }],
                     orderBy: 'status'
                   };
-                  _context13.t0 = assert;
-                  _context13.next = 8;
+                  _context14.t0 = assert;
+                  _context14.next = 8;
                   return adapter.findAll(Post, query);
 
                 case 8:
-                  _context13.t1 = _context13.sent;
-                  _context13.t2 = [posts[0], posts[4], posts[2]];
+                  _context14.t1 = _context14.sent;
+                  _context14.t2 = [posts[0], posts[4], posts[2]];
 
-                  _context13.t0.objectsEqual.call(_context13.t0, _context13.t1, _context13.t2);
+                  _context14.t0.objectsEqual.call(_context14.t0, _context14.t1, _context14.t2);
 
                 case 11:
                 case 'end':
-                  return _context13.stop();
+                  return _context14.stop();
               }
             }
-          }, _callee13, this);
+          }, _callee14, this);
         })));
       }
     });
