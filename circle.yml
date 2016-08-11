@@ -9,7 +9,7 @@ dependencies:
   pre:
     - npm i -g npm
     - npm i -g codecov nyc
-    - npm i js-data@beta
+    - npm i js-data@rc
 test:
   post:
     - nyc report --reporter=lcov | codecov
