@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
   "description": "Base adapter class that all other js-data adapters extend.",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -64,17 +64,17 @@
     "release": "npm test && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.10"
+    "js-data": "^3.0.0-rc.4"
   },
   "dependencies": {
     "chai": "^3.5.0",
-    "mocha": "^2.5.3",
-    "sinon": "^1.17.4"
+    "mocha": "^3.0.2",
+    "sinon": "^1.17.5"
   },
   "devDependencies": {
-    "babel-plugin-syntax-async-functions": "6.8.0",
-    "babel-plugin-transform-regenerator": "6.9.0",
+    "babel-plugin-syntax-async-functions": "6.13.0",
+    "babel-plugin-transform-regenerator": "6.11.4",
     "babel-preset-stage-0": "6.5.0",
-    "js-data-repo-tools": "0.5.5"
+    "js-data-repo-tools": "0.5.6"
   }
 }
