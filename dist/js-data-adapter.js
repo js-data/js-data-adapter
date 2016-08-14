@@ -169,7 +169,7 @@
    */
   function Adapter(opts) {
     jsData.utils.classCallCheck(this, Adapter);
-    jsData.Component.call(this);
+    jsData.Component.call(this, opts);
     opts || (opts = {});
     jsData.utils.fillIn(opts, DEFAULTS);
     jsData.utils.fillIn(this, opts);
