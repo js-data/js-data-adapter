@@ -1,3 +1,8 @@
+##### 0.8.1 - 13 August 2016
+
+###### Bug fixes
+- Options weren't being passed to the `Component` constructor
+
 ##### 0.8.0 - 10 August 2016
 
 ###### Breaking changes
