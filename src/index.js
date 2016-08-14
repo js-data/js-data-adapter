@@ -103,7 +103,7 @@ const DEFAULTS = {
  */
 export function Adapter (opts) {
   utils.classCallCheck(this, Adapter)
-  Component.call(this)
+  Component.call(this, opts)
   opts || (opts = {})
   utils.fillIn(opts, DEFAULTS)
   utils.fillIn(this, opts)
