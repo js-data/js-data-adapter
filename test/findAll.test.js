@@ -42,7 +42,6 @@ export default function (options) {
       const result = await adapter.findAll(User, { age: 30 }, { raw: true })
       const users = result.data
       assert.debug('found', User.name, users)
-      assert.equal(result.mock, true, 'should have metadata')
       assert.equal(users.length, 0, 'users.length')
 
       assert.debug('create', User.name, props)
@@ -53,7 +52,6 @@ export default function (options) {
       assert.debug('findAll', User.name, { name: 'John' })
       const result2 = await adapter.findAll(User, { name: 'John' }, { raw: true })
       const users2 = result2.data
-      assert.equal(result2.mock, true, 'should have metadata')
       assert.debug('found', User.name, users2)
 
       assert.equal(users2.length, 1, 'users2.length')
