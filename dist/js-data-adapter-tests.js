@@ -2907,14 +2907,13 @@
                 users = result.data;
 
                 assert.debug('found', User.name, users);
-                assert.equal(result.mock, true, 'should have metadata');
                 assert.equal(users.length, 0, 'users.length');
 
                 assert.debug('create', User.name, props);
-                _context2.next = 12;
+                _context2.next = 11;
                 return adapter.create(User, props);
 
-              case 12:
+              case 11:
                 user = _context2.sent;
 
                 assert.debug('created', User.name, user);
@@ -2922,21 +2921,20 @@
 
 
                 assert.debug('findAll', User.name, { name: 'John' });
-                _context2.next = 18;
+                _context2.next = 17;
                 return adapter.findAll(User, { name: 'John' }, { raw: true });
 
-              case 18:
+              case 17:
                 result2 = _context2.sent;
                 users2 = result2.data;
 
-                assert.equal(result2.mock, true, 'should have metadata');
                 assert.debug('found', User.name, users2);
 
                 assert.equal(users2.length, 1, 'users2.length');
                 assert.equal(users2[0][User.idAttribute], userId, 'users2[0][User.idAttribute]');
                 assert.equal(users2[0].name, 'John', users2[0].name);
 
-              case 25:
+              case 23:
               case 'end':
                 return _context2.stop();
             }
