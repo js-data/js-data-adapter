@@ -1,3 +1,8 @@
+##### 0.8.2 - 15 August 2016
+
+###### Bug fixes
+- #6 - Remove references to mock by @nvahalik
+
 ##### 0.8.1 - 13 August 2016
 
 ###### Bug fixes
