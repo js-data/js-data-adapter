@@ -1,3 +1,7 @@
+##### 0.8.3 - 07 November 2016
+
+- Upgraded dependencies
+
 ##### 0.8.2 - 15 August 2016
 
 ###### Bug fixes

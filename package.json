@@ -1,7 +1,7 @@
 {
   "name": "js-data-adapter",
   "description": "Base adapter class that all other js-data adapters extend.",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "homepage": "https://github.com/js-data/js-data-adapter",
   "repository": {
     "type": "git",
@@ -43,7 +43,9 @@
   },
   "babel": {
     "presets": [
-      "es2015",
+      [
+        "es2015"
+      ],
       "stage-0"
     ],
     "plugins": [
@@ -58,8 +60,8 @@
     "bundle": "npm run bundle_adapter && npm run bundle_tests",
     "watch": "watch \"npm run bundle\" src/",
     "build": "npm run lint && npm run bundle",
-    "mocha": "mocha -t 30000 -R dot mocha.start.js -r babel-core/register -r babel-polyfill",
-    "cover": "nyc --require babel-core/register --require babel-polyfill --cache mocha mocha.start.js -t 20000 -R dot && nyc report --reporter=html",
+    "mocha": "mocha -t 2000 -R dot mocha.start.js -r babel-core/register -r babel-polyfill",
+    "cover": "nyc --require babel-core/register --require babel-polyfill --cache mocha mocha.start.js -t 2000 -R dot && nyc report --reporter=html",
     "test": "npm run build && npm run cover",
     "release": "npm test && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
@@ -68,13 +70,13 @@
   },
   "dependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.0.2",
-    "sinon": "^1.17.5"
+    "mocha": "^3.1.2",
+    "sinon": "^1.17.6"
   },
   "devDependencies": {
     "babel-plugin-syntax-async-functions": "6.13.0",
-    "babel-plugin-transform-regenerator": "6.14.0",
-    "babel-preset-stage-0": "6.5.0",
-    "js-data-repo-tools": "0.5.6"
+    "babel-plugin-transform-regenerator": "6.16.1",
+    "babel-preset-stage-0": "6.16.0",
+    "js-data-repo-tools": "0.5.9"
   }
 }

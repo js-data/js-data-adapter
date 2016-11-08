@@ -1,8 +1,4 @@
-/*global assert:true */
 'use strict'
-
-// prepare environment for js-data-adapter-tests
-import 'babel-polyfill'
 
 import * as JSData from 'js-data'
 import JSDataAdapterTests from './test/index'

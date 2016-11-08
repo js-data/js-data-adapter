@@ -1,6 +1,6 @@
-var babel = require('rollup-plugin-babel')
+import babel from 'rollup-plugin-babel'
 
-module.exports = {
+export default {
   moduleName: 'JSDataAdapterTests',
   moduleId: 'js-data-adapter-tests',
   external: [
@@ -14,15 +14,21 @@ module.exports = {
   plugins: [
     babel({
       babelrc: false,
-      presets: [
-        'es2015-rollup',
-        'stage-0'
-      ],
+      exclude: 'node_modules/**',
       plugins: [
+        'babel-plugin-external-helpers',
         'syntax-async-functions',
         'transform-regenerator'
       ],
-      exclude: 'node_modules/**'
+      presets: [
+        [
+          'es2015',
+          {
+            modules: false
+          }
+        ],
+        'stage-0'
+      ]
     })
   ]
 }
