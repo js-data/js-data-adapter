@@ -1,6 +1,6 @@
-var babel = require('rollup-plugin-babel')
+import babel from 'rollup-plugin-babel'
 
-module.exports = {
+export default {
   moduleName: 'Adapter',
   moduleId: 'js-data-adapter',
   external: [
@@ -12,10 +12,18 @@ module.exports = {
   plugins: [
     babel({
       babelrc: false,
-      presets: [
-        'es2015-rollup'
+      exclude: 'node_modules/**',
+      plugins: [
+        'babel-plugin-external-helpers'
       ],
-      exclude: 'node_modules/**'
+      presets: [
+        [
+          'es2015',
+          {
+            modules: false
+          }
+        ]
+      ]
     })
   ]
 }

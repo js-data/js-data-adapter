@@ -1,4 +1,4 @@
-import {Component, utils} from 'js-data'
+import { Component, utils } from 'js-data'
 
 export const noop = function (...args) {
   const opts = args[args.length - 1]
