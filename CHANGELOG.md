@@ -1,3 +1,8 @@
+##### 0.8.4 - 01 July 2017
+
+- Upgraded dependencies
+- [#10](https://github.com/js-data/js-data-adapter/pull/10) - fix(adapter): moves loadRelationsFor logic into separate method
+
 ##### 0.8.3 - 07 November 2016
 
 - Upgraded dependencies
