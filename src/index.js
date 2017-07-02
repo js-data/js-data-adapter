@@ -846,15 +846,16 @@ Component.extend({
    * @return {Promise}
    */
   find (mapper, id, opts) {
+    let op
     opts || (opts = {})
     opts.with || (opts.with = [])
 
     // beforeFind lifecycle hook
-    opts.op = 'beforeFind'
-    return utils.resolve(this[opts.op](mapper, id, opts))
+    op = opts.op = 'beforeFind'
+    return utils.resolve(this[op](mapper, id, opts))
       .then(() => {
-        opts.op = 'find'
-        this.dbg(opts.op, mapper, id, opts)
+        op = opts.op = 'find'
+        this.dbg(op, mapper, id, opts)
         return utils.resolve(this._find(mapper, id, opts))
       })
       .then((results) => this.loadRelationsFor(mapper, results, opts))
@@ -864,8 +865,8 @@ Component.extend({
         response = this.respond(response, opts)
 
         // afterFind lifecycle hook
-        opts.op = 'afterFind'
-        return utils.resolve(this[opts.op](mapper, id, opts, response))
+        op = opts.op = 'afterFind'
+        return utils.resolve(this[op](mapper, id, opts, response))
           .then((_response) => _response === undefined ? response : _response)
       })
   },
@@ -890,6 +891,7 @@ Component.extend({
    * @return {Promise}
    */
   findAll (mapper, query, opts) {
+    let op
     opts || (opts = {})
     opts.with || (opts.with = [])
 
@@ -905,11 +907,11 @@ Component.extend({
     }
 
     // beforeFindAll lifecycle hook
-    opts.op = 'beforeFindAll'
-    return utils.resolve(this[opts.op](mapper, query, opts))
+    op = opts.op = 'beforeFindAll'
+    return utils.resolve(this[op](mapper, query, opts))
       .then(() => {
-        opts.op = 'findAll'
-        this.dbg(opts.op, mapper, query, opts)
+        op = opts.op = 'findAll'
+        this.dbg(op, mapper, query, opts)
         return utils.resolve(this._findAll(mapper, query, opts))
       })
       .then((results) => this.loadRelationsFor(mapper, results, opts))
@@ -919,8 +921,8 @@ Component.extend({
         response = this.respond(response, opts)
 
         // afterFindAll lifecycle hook
-        opts.op = 'afterFindAll'
-        return utils.resolve(this[opts.op](mapper, query, opts, response))
+        op = opts.op = 'afterFindAll'
+        return utils.resolve(this[op](mapper, query, opts, response))
           .then((_response) => _response === undefined ? response : _response)
       })
   },
