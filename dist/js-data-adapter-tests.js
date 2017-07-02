@@ -1,10 +1,10 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('chai'), require('sinon')) :
-  typeof define === 'function' && define.amd ? define('js-data-adapter-tests', ['chai', 'sinon'], factory) :
-  (global.JSDataAdapterTests = factory(global.chai,global.sinon));
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('chai'), require('sinon')) :
+	typeof define === 'function' && define.amd ? define('js-data-adapter-tests', ['chai', 'sinon'], factory) :
+	(global.JSDataAdapterTests = factory(global.chai,global.sinon));
 }(this, (function (chai,sinon$1) { 'use strict';
 
-sinon$1 = 'default' in sinon$1 ? sinon$1['default'] : sinon$1;
+sinon$1 = sinon$1 && 'default' in sinon$1 ? sinon$1['default'] : sinon$1;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -16,118 +16,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -203,30 +92,7 @@ var defineProperty = function (obj, key, value) {
   return obj;
 };
 
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
 
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -262,30 +128,6 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
-
 /* global assert:true */
 var afterCreateTest = function (options) {
   describe('Adapter#afterCreate', function () {
@@ -303,7 +145,7 @@ var afterCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'afterCreate should have received options');
                 assert.equal(opts.op, 'afterCreate', 'opts.op');
               });
@@ -349,7 +191,7 @@ var afterCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'afterCreate should have received options');
                 assert.equal(opts.op, 'afterCreate', 'opts.op');
                 return 'foo';
@@ -395,7 +237,7 @@ var afterCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterCreate', function (mapper, props, opts, record) {
+              sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts, record) {
                 assert.isDefined(opts, 'afterCreate should have received options');
                 assert.equal(opts.op, 'afterCreate', 'opts.op');
                 return Promise.resolve();
@@ -442,7 +284,7 @@ var afterCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'afterCreate should have received options');
                 assert.equal(opts.op, 'afterCreate', 'opts.op');
                 return 'foo';
@@ -488,7 +330,7 @@ var afterCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'afterCreate should have received options');
                 assert.equal(opts.op, 'afterCreate', 'opts.op');
               });
@@ -546,7 +388,7 @@ var afterUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'afterUpdate should have received options');
                 assert.equal(opts.op, 'afterUpdate', 'opts.op');
               });
@@ -608,7 +450,7 @@ var afterUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'afterUpdate should have received options');
                 assert.equal(opts.op, 'afterUpdate', 'opts.op');
               });
@@ -673,7 +515,7 @@ var afterUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'afterUpdate should have received options');
                 assert.equal(opts.op, 'afterUpdate', 'opts.op');
                 return 'foo';
@@ -735,7 +577,7 @@ var afterUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'afterUpdate should have received options');
                 assert.equal(opts.op, 'afterUpdate', 'opts.op');
                 return Promise.resolve();
@@ -798,7 +640,7 @@ var afterUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'afterUpdate should have received options');
                 assert.equal(opts.op, 'afterUpdate', 'opts.op');
                 return Promise.resolve('foo');
@@ -869,7 +711,7 @@ var beforeCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'beforeCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'beforeCreate should have received options');
                 assert.equal(opts.op, 'beforeCreate', 'opts.op');
               });
@@ -914,7 +756,7 @@ var beforeCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'beforeCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'beforeCreate should have received options');
                 assert.equal(opts.op, 'beforeCreate', 'opts.op');
                 return { name: 'Sally' };
@@ -960,7 +802,7 @@ var beforeCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'beforeCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'beforeCreate should have received options');
                 assert.equal(opts.op, 'beforeCreate', 'opts.op');
                 return Promise.resolve();
@@ -1006,7 +848,7 @@ var beforeCreateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeCreate', function (mapper, props, opts) {
+              sinon.stub(adapter, 'beforeCreate').callsFake(function (mapper, props, opts) {
                 assert.isDefined(opts, 'beforeCreate should have received options');
                 assert.equal(opts.op, 'beforeCreate', 'opts.op');
                 return Promise.resolve({ name: 'Sally' });
@@ -1061,7 +903,7 @@ var beforeUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'beforeUpdate should have received options');
                 assert.equal(opts.op, 'beforeUpdate', 'opts.op');
               });
@@ -1119,7 +961,7 @@ var beforeUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'beforeUpdate should have received options');
                 assert.equal(opts.op, 'beforeUpdate', 'opts.op');
                 return { name: 'Sally' };
@@ -1178,7 +1020,7 @@ var beforeUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'beforeUpdate should have received options');
                 assert.equal(opts.op, 'beforeUpdate', 'opts.op');
                 return Promise.resolve();
@@ -1237,7 +1079,7 @@ var beforeUpdateTest = function (options) {
               props = { name: 'John' };
 
 
-              sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+              sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
                 assert.isDefined(opts, 'beforeUpdate should have received options');
                 assert.equal(opts.op, 'beforeUpdate', 'opts.op');
                 return Promise.resolve({ name: 'Sally' });
@@ -4381,7 +4223,7 @@ var updateTest = function (options) {
               store = this.$$container;
 
 
-              sinon.stub(adapter, '_update', function (mapper, id, props, opts) {
+              sinon.stub(adapter, '_update').callsFake(function (mapper, id, props, opts) {
                 assert.deepEqual(props.posts, [{
                   id: 1234,
                   userId: 1

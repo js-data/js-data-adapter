@@ -1,143 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('js-data')) :
-  typeof define === 'function' && define.amd ? define('js-data-adapter', ['exports', 'js-data'], factory) :
-  (factory((global.Adapter = global.Adapter || {}),global.JSData));
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('js-data')) :
+	typeof define === 'function' && define.amd ? define('js-data-adapter', ['exports', 'js-data'], factory) :
+	(factory((global.Adapter = global.Adapter || {}),global.JSData));
 }(this, (function (exports,jsData) { 'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
-
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
-
-
-
-
-
-
-
-
-
-
-
-
 
 var defineProperty = function (obj, key, value) {
   if (key in obj) {
@@ -154,30 +19,6 @@ var defineProperty = function (obj, key, value) {
   return obj;
 };
 
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
 
 
 
@@ -195,27 +36,8 @@ var get = function get(object, property, receiver) {
 
 
 
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
 
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
 
 var slicedToArray = function () {
   function sliceIterator(arr, i) {
@@ -346,20 +168,19 @@ var DEFAULTS = {
    * @default false
    */
   raw: false
-};
 
-/**
- * Abstract class meant to be extended by adapters.
- *
- * @class Adapter
- * @abstract
- * @extends Component
- * @param {Object} [opts] Configuration opts.
- * @param {boolean} [opts.debug=false] Whether to log debugging information.
- * @param {boolean} [opts.raw=false] Whether to return a more detailed response
- * object.
- */
-function Adapter(opts) {
+  /**
+   * Abstract class meant to be extended by adapters.
+   *
+   * @class Adapter
+   * @abstract
+   * @extends Component
+   * @param {Object} [opts] Configuration opts.
+   * @param {boolean} [opts.debug=false] Whether to log debugging information.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed response
+   * object.
+   */
+};function Adapter(opts) {
   jsData.utils.classCallCheck(this, Adapter);
   jsData.Component.call(this, opts);
   opts || (opts = {});
@@ -1092,16 +913,10 @@ jsData.Component.extend({
     var relationDef = def.getRelation();
 
     if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
-      var _ret = function () {
-        var record = records;
-        return {
-          v: _this6.find(relationDef, _this6.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
-            def.setLocalField(record, relatedItem);
-          })
-        };
-      }();
-
-      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      var record = records;
+      return this.find(relationDef, this.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
+        def.setLocalField(record, relatedItem);
+      });
     } else {
       var keys = records.map(function (record) {
         return _this6.makeBelongsToForeignKey(mapper, def, record);
@@ -1141,9 +956,7 @@ jsData.Component.extend({
   find: function find(mapper, id, opts) {
     var _this7 = this;
 
-    var record = void 0,
-        op = void 0;
-    var meta = {};
+    var op = void 0;
     opts || (opts = {});
     opts.with || (opts.with = []);
 
@@ -1154,39 +967,12 @@ jsData.Component.extend({
       _this7.dbg(op, mapper, id, opts);
       return jsData.utils.resolve(_this7._find(mapper, id, opts));
     }).then(function (results) {
-      var _results6 = slicedToArray(results, 2),
-          _record = _results6[0],
-          _meta = _results6[1];
+      return _this7.loadRelationsFor(mapper, results, opts);
+    }).then(function (_ref) {
+      var _ref2 = slicedToArray(_ref, 2),
+          record = _ref2[0],
+          meta = _ref2[1];
 
-      if (!_record) {
-        return;
-      }
-      record = _record;
-      meta = _meta;
-      var tasks = [];
-
-      jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
-        var task = void 0;
-        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
-          if (def.type === 'hasOne') {
-            task = _this7.loadHasOne(mapper, def, record, __opts);
-          } else {
-            task = _this7.loadHasMany(mapper, def, record, __opts);
-          }
-        } else if (def.type === 'hasMany' && def.localKeys) {
-          task = _this7.loadHasManyLocalKeys(mapper, def, record, __opts);
-        } else if (def.type === 'hasMany' && def.foreignKeys) {
-          task = _this7.loadHasManyForeignKeys(mapper, def, record, __opts);
-        } else if (def.type === 'belongsTo') {
-          task = _this7.loadBelongsTo(mapper, def, record, __opts);
-        }
-        if (task) {
-          tasks.push(task);
-        }
-      });
-
-      return jsData.utils.Promise.all(tasks);
-    }).then(function () {
       var response = new Response(record, meta, 'find');
       response.found = record ? 1 : 0;
       response = _this7.respond(response, opts);
@@ -1222,12 +1008,10 @@ jsData.Component.extend({
   findAll: function findAll(mapper, query, opts) {
     var _this8 = this;
 
+    var op = void 0;
     opts || (opts = {});
     opts.with || (opts.with = []);
 
-    var records = [];
-    var meta = {};
-    var op = void 0;
     var activeWith = opts._activeWith;
 
     if (jsData.utils.isObject(activeWith)) {
@@ -1246,35 +1030,12 @@ jsData.Component.extend({
       _this8.dbg(op, mapper, query, opts);
       return jsData.utils.resolve(_this8._findAll(mapper, query, opts));
     }).then(function (results) {
-      var _results7 = slicedToArray(results, 2),
-          _records = _results7[0],
-          _meta = _results7[1];
+      return _this8.loadRelationsFor(mapper, results, opts);
+    }).then(function (_ref3) {
+      var _ref4 = slicedToArray(_ref3, 2),
+          records = _ref4[0],
+          meta = _ref4[1];
 
-      _records || (_records = []);
-      records = _records;
-      meta = _meta;
-      var tasks = [];
-      jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
-        var task = void 0;
-        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
-          if (def.type === 'hasMany') {
-            task = _this8.loadHasMany(mapper, def, records, __opts);
-          } else {
-            task = _this8.loadHasOne(mapper, def, records, __opts);
-          }
-        } else if (def.type === 'hasMany' && def.localKeys) {
-          task = _this8.loadHasManyLocalKeys(mapper, def, records, __opts);
-        } else if (def.type === 'hasMany' && def.foreignKeys) {
-          task = _this8.loadHasManyForeignKeys(mapper, def, records, __opts);
-        } else if (def.type === 'belongsTo') {
-          task = _this8.loadBelongsTo(mapper, def, records, __opts);
-        }
-        if (task) {
-          tasks.push(task);
-        }
-      });
-      return jsData.utils.Promise.all(tasks);
-    }).then(function () {
       var response = new Response(records, meta, 'findAll');
       response.found = records.length;
       response = _this8.respond(response, opts);
@@ -1284,6 +1045,40 @@ jsData.Component.extend({
       return jsData.utils.resolve(_this8[op](mapper, query, opts, response)).then(function (_response) {
         return _response === undefined ? response : _response;
       });
+    });
+  },
+  loadRelationsFor: function loadRelationsFor(mapper, results, opts) {
+    var _this9 = this;
+
+    var _results6 = slicedToArray(results, 1),
+        records = _results6[0];
+
+    var tasks = [];
+
+    if (records) {
+      jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
+        var task = void 0;
+        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+          if (def.type === 'hasOne') {
+            task = _this9.loadHasOne(mapper, def, records, __opts);
+          } else {
+            task = _this9.loadHasMany(mapper, def, records, __opts);
+          }
+        } else if (def.type === 'hasMany' && def.localKeys) {
+          task = _this9.loadHasManyLocalKeys(mapper, def, records, __opts);
+        } else if (def.type === 'hasMany' && def.foreignKeys) {
+          task = _this9.loadHasManyForeignKeys(mapper, def, records, __opts);
+        } else if (def.type === 'belongsTo') {
+          task = _this9.loadBelongsTo(mapper, def, records, __opts);
+        }
+        if (task) {
+          tasks.push(task);
+        }
+      });
+    }
+
+    return jsData.utils.Promise.all(tasks).then(function () {
+      return results;
     });
   },
 
@@ -1314,7 +1109,7 @@ jsData.Component.extend({
    * @return {Promise}
    */
   loadHasMany: function loadHasMany(mapper, def, records, __opts) {
-    var _this9 = this;
+    var _this10 = this;
 
     var singular = false;
 
@@ -1323,7 +1118,7 @@ jsData.Component.extend({
       records = [records];
     }
     var IDs = records.map(function (record) {
-      return _this9.makeHasManyForeignKey(mapper, def, record);
+      return _this10.makeHasManyForeignKey(mapper, def, record);
     });
     var query = {
       where: {}
@@ -1355,7 +1150,7 @@ jsData.Component.extend({
     });
   },
   loadHasManyLocalKeys: function loadHasManyLocalKeys(mapper, def, records, __opts) {
-    var _this10 = this;
+    var _this11 = this;
 
     var record = void 0;
     var relatedMapper = def.getRelation();
@@ -1373,40 +1168,34 @@ jsData.Component.extend({
         def.setLocalField(record, relatedItems);
       });
     } else {
-      var _ret2 = function () {
-        var localKeys = [];
-        records.forEach(function (record) {
-          localKeys = localKeys.concat(_this10.makeHasManyLocalKeys(mapper, def, record));
-        });
-        return {
-          v: _this10.findAll(relatedMapper, {
-            where: defineProperty({}, relatedMapper.idAttribute, {
-              'in': unique(localKeys).filter(function (x) {
-                return x;
-              })
-            })
-          }, __opts).then(function (relatedItems) {
-            records.forEach(function (item) {
-              var attached = [];
-              var itemKeys = jsData.utils.get(item, def.localKeys) || [];
-              itemKeys = jsData.utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
-              relatedItems.forEach(function (relatedItem) {
-                if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
-                  attached.push(relatedItem);
-                }
-              });
-              def.setLocalField(item, attached);
-            });
-            return relatedItems;
+      var localKeys = [];
+      records.forEach(function (record) {
+        localKeys = localKeys.concat(_this11.makeHasManyLocalKeys(mapper, def, record));
+      });
+      return this.findAll(relatedMapper, {
+        where: defineProperty({}, relatedMapper.idAttribute, {
+          'in': unique(localKeys).filter(function (x) {
+            return x;
           })
-        };
-      }();
-
-      if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+        })
+      }, __opts).then(function (relatedItems) {
+        records.forEach(function (item) {
+          var attached = [];
+          var itemKeys = jsData.utils.get(item, def.localKeys) || [];
+          itemKeys = jsData.utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+          relatedItems.forEach(function (relatedItem) {
+            if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
+              attached.push(relatedItem);
+            }
+          });
+          def.setLocalField(item, attached);
+        });
+        return relatedItems;
+      });
     }
   },
   loadHasManyForeignKeys: function loadHasManyForeignKeys(mapper, def, records, __opts) {
-    var _this11 = this;
+    var _this12 = this;
 
     var relatedMapper = def.getRelation();
     var idAttribute = mapper.idAttribute;
@@ -1428,7 +1217,7 @@ jsData.Component.extend({
       return this.findAll(relatedMapper, {
         where: defineProperty({}, def.foreignKeys, {
           'isectNotEmpty': records.map(function (record) {
-            return _this11.makeHasManyForeignKeys(mapper, def, record);
+            return _this12.makeHasManyForeignKeys(mapper, def, record);
           })
         })
       }, __opts).then(function (relatedItems) {
@@ -1559,7 +1348,7 @@ jsData.Component.extend({
    * @return {Promise}
    */
   sum: function sum(mapper, field, query, opts) {
-    var _this12 = this;
+    var _this13 = this;
 
     var op = void 0;
     if (!jsData.utils.isString(field)) {
@@ -1573,20 +1362,20 @@ jsData.Component.extend({
     return jsData.utils.resolve(this[op](mapper, field, query, opts)).then(function () {
       // Allow for re-assignment from lifecycle hook
       op = opts.op = 'sum';
-      _this12.dbg(op, mapper, field, query, opts);
-      return jsData.utils.resolve(_this12._sum(mapper, field, query, opts));
+      _this13.dbg(op, mapper, field, query, opts);
+      return jsData.utils.resolve(_this13._sum(mapper, field, query, opts));
     }).then(function (results) {
-      var _results8 = slicedToArray(results, 2),
-          data = _results8[0],
-          result = _results8[1];
+      var _results7 = slicedToArray(results, 2),
+          data = _results7[0],
+          result = _results7[1];
 
       result || (result = {});
       var response = new Response(data, result, op);
-      response = _this12.respond(response, opts);
+      response = _this13.respond(response, opts);
 
       // afterSum lifecycle hook
       op = opts.op = 'afterSum';
-      return jsData.utils.resolve(_this12[op](mapper, field, query, opts, response)).then(function (_response) {
+      return jsData.utils.resolve(_this13[op](mapper, field, query, opts, response)).then(function (_response) {
         return _response === undefined ? response : _response;
       });
     });
@@ -1621,7 +1410,7 @@ jsData.Component.extend({
    * @return {Promise}
    */
   update: function update(mapper, id, props, opts) {
-    var _this13 = this;
+    var _this14 = this;
 
     props || (props = {});
     opts || (opts = {});
@@ -1634,21 +1423,21 @@ jsData.Component.extend({
       props = _props === undefined ? props : _props;
       props = withoutRelations(mapper, props, opts);
       op = opts.op = 'update';
-      _this13.dbg(op, mapper, id, props, opts);
-      return jsData.utils.resolve(_this13._update(mapper, id, props, opts));
+      _this14.dbg(op, mapper, id, props, opts);
+      return jsData.utils.resolve(_this14._update(mapper, id, props, opts));
     }).then(function (results) {
-      var _results9 = slicedToArray(results, 2),
-          data = _results9[0],
-          result = _results9[1];
+      var _results8 = slicedToArray(results, 2),
+          data = _results8[0],
+          result = _results8[1];
 
       result || (result = {});
       var response = new Response(data, result, 'update');
       response.updated = data ? 1 : 0;
-      response = _this13.respond(response, opts);
+      response = _this14.respond(response, opts);
 
       // afterUpdate lifecycle hook
       op = opts.op = 'afterUpdate';
-      return jsData.utils.resolve(_this13[op](mapper, id, props, opts, response)).then(function (_response) {
+      return jsData.utils.resolve(_this14[op](mapper, id, props, opts, response)).then(function (_response) {
         return _response === undefined ? response : _response;
       });
     });
@@ -1676,7 +1465,7 @@ jsData.Component.extend({
    * @return {Promise}
    */
   updateAll: function updateAll(mapper, props, query, opts) {
-    var _this14 = this;
+    var _this15 = this;
 
     props || (props = {});
     query || (query = {});
@@ -1690,22 +1479,22 @@ jsData.Component.extend({
       props = _props === undefined ? props : _props;
       props = withoutRelations(mapper, props, opts);
       op = opts.op = 'updateAll';
-      _this14.dbg(op, mapper, props, query, opts);
-      return jsData.utils.resolve(_this14._updateAll(mapper, props, query, opts));
+      _this15.dbg(op, mapper, props, query, opts);
+      return jsData.utils.resolve(_this15._updateAll(mapper, props, query, opts));
     }).then(function (results) {
-      var _results10 = slicedToArray(results, 2),
-          data = _results10[0],
-          result = _results10[1];
+      var _results9 = slicedToArray(results, 2),
+          data = _results9[0],
+          result = _results9[1];
 
       data || (data = []);
       result || (result = {});
       var response = new Response(data, result, 'updateAll');
       response.updated = data.length;
-      response = _this14.respond(response, opts);
+      response = _this15.respond(response, opts);
 
       // afterUpdateAll lifecycle hook
       op = opts.op = 'afterUpdateAll';
-      return jsData.utils.resolve(_this14[op](mapper, props, query, opts, response)).then(function (_response) {
+      return jsData.utils.resolve(_this15[op](mapper, props, query, opts, response)).then(function (_response) {
         return _response === undefined ? response : _response;
       });
     });
@@ -1725,7 +1514,7 @@ jsData.Component.extend({
    * @return {Promise}
    */
   updateMany: function updateMany(mapper, records, opts) {
-    var _this15 = this;
+    var _this16 = this;
 
     records || (records = []);
     opts || (opts = {});
@@ -1745,22 +1534,22 @@ jsData.Component.extend({
         return withoutRelations(mapper, record, opts);
       });
       op = opts.op = 'updateMany';
-      _this15.dbg(op, mapper, records, opts);
-      return jsData.utils.resolve(_this15._updateMany(mapper, records, opts));
+      _this16.dbg(op, mapper, records, opts);
+      return jsData.utils.resolve(_this16._updateMany(mapper, records, opts));
     }).then(function (results) {
-      var _results11 = slicedToArray(results, 2),
-          data = _results11[0],
-          result = _results11[1];
+      var _results10 = slicedToArray(results, 2),
+          data = _results10[0],
+          result = _results10[1];
 
       data || (data = []);
       result || (result = {});
       var response = new Response(data, result, 'updateMany');
       response.updated = data.length;
-      response = _this15.respond(response, opts);
+      response = _this16.respond(response, opts);
 
       // afterUpdateMany lifecycle hook
       op = opts.op = 'afterUpdateMany';
-      return jsData.utils.resolve(_this15[op](mapper, records, opts, response)).then(function (_response) {
+      return jsData.utils.resolve(_this16[op](mapper, records, opts, response)).then(function (_response) {
         return _response === undefined ? response : _response;
       });
     });
