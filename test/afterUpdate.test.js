@@ -9,7 +9,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'afterUpdate should have received options')
         assert.equal(opts.op, 'afterUpdate', 'opts.op')
       })
@@ -47,7 +47,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'afterUpdate should have received options')
         assert.equal(opts.op, 'afterUpdate', 'opts.op')
       })
@@ -88,7 +88,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'afterUpdate should have received options')
         assert.equal(opts.op, 'afterUpdate', 'opts.op')
         return 'foo'
@@ -126,7 +126,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'afterUpdate should have received options')
         assert.equal(opts.op, 'afterUpdate', 'opts.op')
         return Promise.resolve()
@@ -165,7 +165,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'afterUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'afterUpdate should have received options')
         assert.equal(opts.op, 'afterUpdate', 'opts.op')
         return Promise.resolve('foo')

@@ -9,7 +9,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+      sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
         assert.isDefined(opts, 'afterCreate should have received options')
         assert.equal(opts.op, 'afterCreate', 'opts.op')
       })
@@ -36,7 +36,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+      sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
         assert.isDefined(opts, 'afterCreate should have received options')
         assert.equal(opts.op, 'afterCreate', 'opts.op')
         return 'foo'
@@ -63,7 +63,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterCreate', function (mapper, props, opts, record) {
+      sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts, record) {
         assert.isDefined(opts, 'afterCreate should have received options')
         assert.equal(opts.op, 'afterCreate', 'opts.op')
         return Promise.resolve()
@@ -91,7 +91,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+      sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
         assert.isDefined(opts, 'afterCreate should have received options')
         assert.equal(opts.op, 'afterCreate', 'opts.op')
         return 'foo'
@@ -118,7 +118,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'afterCreate', function (mapper, props, opts) {
+      sinon.stub(adapter, 'afterCreate').callsFake(function (mapper, props, opts) {
         assert.isDefined(opts, 'afterCreate should have received options')
         assert.equal(opts.op, 'afterCreate', 'opts.op')
       })

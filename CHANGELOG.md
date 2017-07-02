@@ -1,3 +1,7 @@
+##### 0.8.5 - 01 July 2017
+
+- Upgrade build process
+
 ##### 0.8.4 - 01 July 2017
 
 - Upgraded dependencies

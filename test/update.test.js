@@ -75,7 +75,7 @@ export default function (options) {
       const adapter = this.$$adapter
       const store = this.$$container
 
-      sinon.stub(adapter, '_update', function (mapper, id, props, opts) {
+      sinon.stub(adapter, '_update').callsFake(function (mapper, id, props, opts) {
         assert.deepEqual(props.posts, [
           {
             id: 1234,

@@ -9,7 +9,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'beforeUpdate should have received options')
         assert.equal(opts.op, 'beforeUpdate', 'opts.op')
       })
@@ -43,7 +43,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'beforeUpdate should have received options')
         assert.equal(opts.op, 'beforeUpdate', 'opts.op')
         return { name: 'Sally' }
@@ -78,7 +78,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'beforeUpdate should have received options')
         assert.equal(opts.op, 'beforeUpdate', 'opts.op')
         return Promise.resolve()
@@ -113,7 +113,7 @@ export default function (options) {
       const User = this.$$User
       const props = { name: 'John' }
 
-      sinon.stub(adapter, 'beforeUpdate', function (mapper, id, props, opts) {
+      sinon.stub(adapter, 'beforeUpdate').callsFake(function (mapper, id, props, opts) {
         assert.isDefined(opts, 'beforeUpdate should have received options')
         assert.equal(opts.op, 'beforeUpdate', 'opts.op')
         return Promise.resolve({ name: 'Sally' })
