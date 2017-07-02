@@ -1,3 +1,16 @@
+##### 1.0.0 - 02 July 2017
+
+**1.0.0 stable release, now depending on js-data@3.0.0**
+
+##### 0.8.5 - 01 July 2017
+
+- Upgrade build process
+
+##### 0.8.4 - 01 July 2017
+
+- Upgraded dependencies
+- [#10](https://github.com/js-data/js-data-adapter/pull/10) - fix(adapter): moves loadRelationsFor logic into separate method
+
 ##### 0.8.3 - 07 November 2016
 
 - Upgraded dependencies

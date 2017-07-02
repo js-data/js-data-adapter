@@ -846,8 +846,7 @@ Component.extend({
    * @return {Promise}
    */
   find (mapper, id, opts) {
-    let record, op
-    let meta = {}
+    let op
     opts || (opts = {})
     opts.with || (opts.with = [])
 
@@ -859,38 +858,8 @@ Component.extend({
         this.dbg(op, mapper, id, opts)
         return utils.resolve(this._find(mapper, id, opts))
       })
-      .then((results) => {
-        let [_record, _meta] = results
-        if (!_record) {
-          return
-        }
-        record = _record
-        meta = _meta
-        const tasks = []
-
-        utils.forEachRelation(mapper, opts, (def, __opts) => {
-          let task
-          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
-            if (def.type === 'hasOne') {
-              task = this.loadHasOne(mapper, def, record, __opts)
-            } else {
-              task = this.loadHasMany(mapper, def, record, __opts)
-            }
-          } else if (def.type === 'hasMany' && def.localKeys) {
-            task = this.loadHasManyLocalKeys(mapper, def, record, __opts)
-          } else if (def.type === 'hasMany' && def.foreignKeys) {
-            task = this.loadHasManyForeignKeys(mapper, def, record, __opts)
-          } else if (def.type === 'belongsTo') {
-            task = this.loadBelongsTo(mapper, def, record, __opts)
-          }
-          if (task) {
-            tasks.push(task)
-          }
-        })
-
-        return utils.Promise.all(tasks)
-      })
-      .then(() => {
+      .then((results) => this.loadRelationsFor(mapper, results, opts))
+      .then(([record, meta]) => {
         let response = new Response(record, meta, 'find')
         response.found = record ? 1 : 0
         response = this.respond(response, opts)
@@ -922,12 +891,10 @@ Component.extend({
    * @return {Promise}
    */
   findAll (mapper, query, opts) {
+    let op
     opts || (opts = {})
     opts.with || (opts.with = [])
 
-    let records = []
-    let meta = {}
-    let op
     const activeWith = opts._activeWith
 
     if (utils.isObject(activeWith)) {
@@ -947,34 +914,8 @@ Component.extend({
         this.dbg(op, mapper, query, opts)
         return utils.resolve(this._findAll(mapper, query, opts))
       })
-      .then((results) => {
-        let [_records, _meta] = results
-        _records || (_records = [])
-        records = _records
-        meta = _meta
-        const tasks = []
-        utils.forEachRelation(mapper, opts, (def, __opts) => {
-          let task
-          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
-            if (def.type === 'hasMany') {
-              task = this.loadHasMany(mapper, def, records, __opts)
-            } else {
-              task = this.loadHasOne(mapper, def, records, __opts)
-            }
-          } else if (def.type === 'hasMany' && def.localKeys) {
-            task = this.loadHasManyLocalKeys(mapper, def, records, __opts)
-          } else if (def.type === 'hasMany' && def.foreignKeys) {
-            task = this.loadHasManyForeignKeys(mapper, def, records, __opts)
-          } else if (def.type === 'belongsTo') {
-            task = this.loadBelongsTo(mapper, def, records, __opts)
-          }
-          if (task) {
-            tasks.push(task)
-          }
-        })
-        return utils.Promise.all(tasks)
-      })
-      .then(() => {
+      .then((results) => this.loadRelationsFor(mapper, results, opts))
+      .then(([records, meta]) => {
         let response = new Response(records, meta, 'findAll')
         response.found = records.length
         response = this.respond(response, opts)
@@ -984,6 +925,36 @@ Component.extend({
         return utils.resolve(this[op](mapper, query, opts, response))
           .then((_response) => _response === undefined ? response : _response)
       })
+  },
+
+  loadRelationsFor (mapper, results, opts) {
+    const [records] = results
+    const tasks = []
+
+    if (records) {
+      utils.forEachRelation(mapper, opts, (def, __opts) => {
+        let task
+        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+          if (def.type === 'hasOne') {
+            task = this.loadHasOne(mapper, def, records, __opts)
+          } else {
+            task = this.loadHasMany(mapper, def, records, __opts)
+          }
+        } else if (def.type === 'hasMany' && def.localKeys) {
+          task = this.loadHasManyLocalKeys(mapper, def, records, __opts)
+        } else if (def.type === 'hasMany' && def.foreignKeys) {
+          task = this.loadHasManyForeignKeys(mapper, def, records, __opts)
+        } else if (def.type === 'belongsTo') {
+          task = this.loadBelongsTo(mapper, def, records, __opts)
+        }
+        if (task) {
+          tasks.push(task)
+        }
+      })
+    }
+
+    return utils.Promise.all(tasks)
+      .then(() => results)
   },
 
   /**

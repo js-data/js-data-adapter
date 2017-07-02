@@ -2,7 +2,9 @@ import babel from 'rollup-plugin-babel'
 
 export default {
   moduleName: 'Adapter',
-  moduleId: 'js-data-adapter',
+  amd: {
+    id: 'js-data-adapter'
+  },
   external: [
     'js-data'
   ],
@@ -12,9 +14,8 @@ export default {
   plugins: [
     babel({
       babelrc: false,
-      exclude: 'node_modules/**',
       plugins: [
-        'babel-plugin-external-helpers'
+        'external-helpers'
       ],
       presets: [
         [
@@ -23,7 +24,8 @@ export default {
             modules: false
           }
         ]
-      ]
+      ],
+      exclude: 'node_modules/**'
     })
   ]
 }

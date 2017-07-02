@@ -2,7 +2,9 @@ import babel from 'rollup-plugin-babel'
 
 export default {
   moduleName: 'JSDataAdapterTests',
-  moduleId: 'js-data-adapter-tests',
+  amd: {
+    id: 'js-data-adapter-tests'
+  },
   external: [
     'chai',
     'sinon'
