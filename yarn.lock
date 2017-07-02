@@ -2309,9 +2309,9 @@ js-data-repo-tools@1.0.0:
     npm-check-updates "2.8.9"
     standard "8.6.0"
 
-js-data@^3.0.0-rc.9:
-  version "3.0.0-rc.9"
-  resolved "https://registry.yarnpkg.com/js-data/-/js-data-3.0.0-rc.9.tgz#d447382444416d66daef845f1916fd0280bb7590"
+"js-data@>= 3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/js-data/-/js-data-3.0.0.tgz#59628af903fac61cec99a7dad2db6a076f51c6ef"
 
 js-tokens@^3.0.0:
   version "3.0.2"

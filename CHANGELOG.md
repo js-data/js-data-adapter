@@ -1,3 +1,7 @@
+##### 1.0.0 - 02 July 2017
+
+**1.0.0 stable release, now depending on js-data@3.0.0**
+
 ##### 0.8.5 - 01 July 2017
 
 - Upgrade build process
