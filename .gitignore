@@ -6,3 +6,4 @@ doc
 dist/*.js
 dist/*.map
 *.log
+.idea/
