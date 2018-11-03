@@ -806,29 +806,35 @@ Component.extend({
 
     if (utils.isObject(records) && !utils.isArray(records)) {
       const record = records
-      return this.find(relationDef, this.makeBelongsToForeignKey(mapper, def, record), __opts)
-        .then((relatedItem) => {
-          def.setLocalField(record, relatedItem)
-        })
+      const foreignKey = this.makeBelongsToForeignKey(mapper, def, record)
+      if (foreignKey) {
+        return this.find(relationDef, foreignKey, __opts)
+          .then((relatedItem) => {
+            def.setLocalField(record, relatedItem)
+          })
+      }
     } else {
       const keys = records
         .map((record) => this.makeBelongsToForeignKey(mapper, def, record))
         .filter((key) => key)
-      return this.findAll(relationDef, {
-        where: {
-          [relationDef.idAttribute]: {
-            'in': keys
-          }
-        }
-      }, __opts).then((relatedItems) => {
-        records.forEach((record) => {
-          relatedItems.forEach((relatedItem) => {
-            if (relatedItem[relationDef.idAttribute] === record[def.foreignKey]) {
-              def.setLocalField(record, relatedItem)
+        .filter((key, index, array) => array.indexOf(key) === index) // unique values
+      if (keys.length) {
+        return this.findAll(relationDef, {
+          where: {
+            [relationDef.idAttribute]: {
+              'in': keys
             }
+          }
+        }, __opts).then((relatedItems) => {
+          records.forEach((record) => {
+            relatedItems.forEach((relatedItem) => {
+              if (relatedItem[relationDef.idAttribute] === record[def.foreignKey]) {
+                def.setLocalField(record, relatedItem)
+              }
+            })
           })
         })
-      })
+      }
     }
   },
 
