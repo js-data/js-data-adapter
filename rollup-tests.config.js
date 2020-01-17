@@ -1,35 +1,34 @@
 import babel from 'rollup-plugin-babel'
 
 export default {
-  moduleName: 'JSDataAdapterTests',
-  amd: {
-    id: 'js-data-adapter-tests'
+  output: {
+    name: 'JSDataAdapterTests',
+    amd: {
+      id: 'js-data-adapter-tests'
+    },
+    globals: {
+      chai: 'chai',
+      sinon: 'sinon'
+    }
   },
   external: [
     'chai',
     'sinon'
   ],
-  globals: {
-    chai: 'chai',
-    sinon: 'sinon'
-  },
   plugins: [
     babel({
       babelrc: false,
       exclude: 'node_modules/**',
       plugins: [
-        'babel-plugin-external-helpers',
-        'syntax-async-functions',
-        'transform-regenerator'
+        '@babel/transform-regenerator'
       ],
       presets: [
         [
-          'es2015',
+          '@babel/preset-env',
           {
             modules: false
           }
-        ],
-        'stage-0'
+        ]
       ]
     })
   ]
