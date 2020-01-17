@@ -1,25 +1,25 @@
 import babel from 'rollup-plugin-babel'
 
 export default {
-  moduleName: 'Adapter',
-  amd: {
-    id: 'js-data-adapter'
+  output: {
+    amd: {
+      id: 'js-data-adapter'
+    },
+    name: 'Adapter',
+    globals: {
+      'js-data': 'JSData'
+    }
   },
   external: [
     'js-data'
   ],
-  globals: {
-    'js-data': 'JSData'
-  },
   plugins: [
     babel({
       babelrc: false,
-      plugins: [
-        'external-helpers'
-      ],
+      plugins: [],
       presets: [
         [
-          'es2015',
+          '@babel/preset-env',
           {
             modules: false
           }
