@@ -1,18 +1,16 @@
 general:
+  artifacts:
+    - dist
   branches:
     ignore:
       - gh-pages
 machine:
   node:
-    version: 6.10.0
+    version: 13
 dependencies:
   pre:
     - npm i -g npm
     - npm i -g codecov nyc
-    - npm i js-data@rc
 test:
   post:
     - nyc report --reporter=lcov | codecov
-general:
-  artifacts:
-    - "dist"

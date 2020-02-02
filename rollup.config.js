@@ -1,31 +1,29 @@
-import babel from 'rollup-plugin-babel'
+import typescript from 'rollup-plugin-typescript2'
 
 export default {
-  moduleName: 'Adapter',
-  amd: {
-    id: 'js-data-adapter'
+  output: {
+    amd: {
+      id: 'js-data-adapter'
+    },
+    name: 'Adapter',
+    globals: {
+      'js-data': 'JSData'
+    }
   },
   external: [
     'js-data'
   ],
-  globals: {
-    'js-data': 'JSData'
-  },
   plugins: [
-    babel({
-      babelrc: false,
-      plugins: [
-        'external-helpers'
-      ],
-      presets: [
-        [
-          'es2015',
-          {
-            modules: false
-          }
+    typescript({
+      tsconfigOverride: {
+        compilerOptions: {
+          module: 'es2015'
+        },
+        exclude: [
+          'test',
+          './rollup.config.js'
         ]
-      ],
-      exclude: 'node_modules/**'
+      }
     })
   ]
 }
