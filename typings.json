@@ -1,8 +1,0 @@
-{
-  "name": "js-data-adapter",
-  "version": false,
-  "main": "./dist/js-data-adapter.d.ts",
-  "ambientDependencies": {
-    "es6-shim": "registry:dt/es6-shim"
-  }
-}
